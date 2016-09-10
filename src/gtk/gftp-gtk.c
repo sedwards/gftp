@@ -1044,25 +1044,18 @@ CreateFTPWindow (gftp_window_data * wdata)
   gtk_container_border_width (GTK_CONTAINER (box), 5);
   gtk_container_add (GTK_CONTAINER (parent), box);
 
-  combo_frame = gtk_frame_new ("Editable");
+  combo_frame = gtk_frame_new (NULL);
   gtk_box_pack_start (GTK_BOX (box), combo_frame, FALSE, FALSE, 0);
 
   combo = gtk_combo_box_text_new_with_entry ();
+  gtk_combo_box_set_button_sensitivity(combo, GTK_SENSITIVITY_ON);
   fill_combo_entry (combo);
   gtk_container_add (GTK_CONTAINER (combo_frame), combo);
 
-  tree_frame = gtk_frame_new ("Editable");
+  tree_frame = gtk_frame_new (NULL);
   gtk_box_pack_start (GTK_BOX (box), tree_frame, FALSE, FALSE, 0);
 
-  //combo2 = gtk_combo_box_text_new_with_entry ();
-  //fill_combo_entry (combo2);
-  //gtk_container_add (GTK_CONTAINER (box), combo2);
-
-//  tree = gftp_dir_tree (box);
-//  gtk_container_add (GTK_CONTAINER (box), tree);
-
       GtkWidget *path_vbox;
-//      GtkWidget *vbox;
       GtkWidget *label;
       GtkWidget *frame;
       GtkWidget *bar;
@@ -1712,6 +1705,10 @@ main (int argc, char **argv)
   ui = CreateFTPWindows (window);
   gtk_container_add (GTK_CONTAINER (window), ui);
   gtk_widget_show (window);
+
+  gtk_window_set_gravity (window, GDK_GRAVITY_CENTER);
+  gtk_window_move (window, gdk_screen_width()/4, gdk_screen_height()/4) ;
+//  gtk_window_move (window, 0, 0) ;
 
   gftpui_common_about (ftp_log, NULL);
 

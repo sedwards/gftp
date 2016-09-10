@@ -1038,11 +1038,16 @@ CreateFTPWindow (gftp_window_data * wdata)
   GtkWidget *tree, *treeview, *view;
 
   GtkComboBox *combo, *combo2;
-  GtkScrolledWindow *scrolled_window;
+  //GtkScrolledWindow *scrolled_window;
+  GtkWidget *scrolled_window;
 
   char *titles[7], tempstr[50], *startup_directory;
   GtkWidget *scroll_list;
   intptr_t listbox_file_height, colwidth;
+
+  /* Get directory or location */
+//  wdata->request = gftp_request_new ();
+//  gftp_gtk_init_request (wdata);
 
   parent = gtk_frame_new (NULL);
 
@@ -1060,10 +1065,9 @@ CreateFTPWindow (gftp_window_data * wdata)
   combo_frame = gtk_frame_new (NULL);
   gtk_box_pack_start (GTK_BOX (box), combo_frame, FALSE, FALSE, 0);
 
-  combo = gtk_combo_box_text_new_with_entry ();
-  gtk_combo_box_set_button_sensitivity(combo, GTK_SENSITIVITY_ON);
-  fill_combo_entry (combo);
-  gtk_container_add (GTK_CONTAINER (combo_frame), combo);
+  wdata->combo = gtk_combo_box_text_new_with_entry ();
+  fill_combo_entry (wdata->combo);
+  gtk_container_add (GTK_CONTAINER (combo_frame), wdata->combo);
 
   tree_frame = gtk_frame_new (NULL);
   gtk_box_pack_start (GTK_BOX (box), tree_frame, FALSE, FALSE, 0);
@@ -1080,24 +1084,21 @@ CreateFTPWindow (gftp_window_data * wdata)
   tree_model = create_model ();
 
   /* create tree view */
-   treeview = gtk_tree_view_new_with_model (tree_model);
-   gtk_tree_view_set_search_column (GTK_TREE_VIEW (treeview),
-                                       COLUMN_FILENAME);
+  treeview = gtk_tree_view_new_with_model (tree_model);
+  gtk_tree_view_set_search_column (GTK_TREE_VIEW (treeview),
+                                   COLUMN_FILENAME);
 
-   g_object_unref (tree_model);
+  g_object_unref (tree_model);
 
-   gtk_container_add (GTK_CONTAINER (scrolled_window), treeview);
+  gtk_container_add (GTK_CONTAINER (scrolled_window), treeview);
 
-   /* add columns to the tree view */
-   add_columns (GTK_TREE_VIEW (treeview));
+  /* add columns to the tree view */
+  add_columns (GTK_TREE_VIEW (treeview));
 
-   /* finish & show */
-   gtk_window_set_default_size (GTK_WINDOW (box), 280, 250);
-   g_signal_connect (box, "delete-event",
-                     G_CALLBACK (window_closed), NULL);
-
-//  char *titles[7], tempstr[50]
-//  g_printf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
+  /* finish & show */
+  //gtk_window_set_default_size (GTK_WINDOW (box), 280, 250);
+  //g_signal_connect (box, "delete-event",
+  //                  G_CALLBACK (window_closed), NULL);
 
 #if 0
    //gtk_dir_tree (GTK_CONTAINER (tree);
@@ -1151,10 +1152,10 @@ CreateFTPWindow (gftp_window_data * wdata)
     gtk_combo_set_popdown_strings (GTK_COMBO (wdata->combo), *wdata->history);
   gtk_combo_disable_activate (GTK_COMBO (wdata->combo));
 
-  g_printf (tempstr, sizeof (tempstr), "%s_startup_directory",
-              wdata->prefix_col_str);
-  g_snprintf (tempstr, sizeof (tempstr), "%s_startup_directory",
-              wdata->prefix_col_str);
+//  g_printf (tempstr, sizeof (tempstr), "%s_startup_directory",
+//              wdata->prefix_col_str);
+//  g_snprintf (tempstr, sizeof (tempstr), "%s_startup_directory",
+//              wdata->prefix_col_str);
 
   gftp_lookup_global_option (tempstr, &startup_directory);
   gtk_entry_set_text (GTK_ENTRY (GTK_COMBO (wdata->combo)->entry),
@@ -1715,7 +1716,7 @@ main (int argc, char **argv)
   gtk_widget_show (window);
 
   gtk_window_set_gravity (window, GDK_GRAVITY_CENTER);
-  gtk_window_move (window, gdk_screen_width()/4, gdk_screen_height()/4) ;
+  gtk_window_move (window, gdk_screen_width()/6, gdk_screen_height()/6) ;
 //  gtk_window_move (window, 0, 0) ;
 
   gftpui_common_about (ftp_log, NULL);

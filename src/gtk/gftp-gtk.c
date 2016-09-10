@@ -1034,12 +1034,25 @@ window_closed (GtkWidget *widget,
 static GtkWidget *
 CreateFTPWindow (gftp_window_data * wdata)
 {
+  GtkWidget *parent, *box, *combo_frame, *tree_frame, *edit_box;
+  GtkWidget *tree, *treeview, *view;
 
-  GtkWidget *parent, *box, *combo_frame, *tree_frame, *edit_box, *tree, *view;
   GtkComboBox *combo, *combo2;
   GtkScrolledWindow *scrolled_window;
 
+  char *titles[7], tempstr[50], *startup_directory;
+  GtkWidget *scroll_list;
+  intptr_t listbox_file_height, colwidth;
+
   parent = gtk_frame_new (NULL);
+
+  gftp_lookup_global_option ("listbox_file_height", &listbox_file_height);
+  g_snprintf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
+  gftp_lookup_global_option (tempstr, &colwidth);
+  gtk_widget_set_size_request (parent, colwidth, listbox_file_height);
+
+  gtk_container_border_width (GTK_CONTAINER (parent), 5);
+
   box = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (box), 5);
   gtk_container_add (GTK_CONTAINER (parent), box);
@@ -1055,41 +1068,36 @@ CreateFTPWindow (gftp_window_data * wdata)
   tree_frame = gtk_frame_new (NULL);
   gtk_box_pack_start (GTK_BOX (box), tree_frame, FALSE, FALSE, 0);
 
-      GtkWidget *path_vbox;
-      GtkWidget *label;
-      GtkWidget *frame;
-      GtkWidget *bar;
-      GtkWidget *sw;
-      GtkWidget *treeview;
+  scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolled_window),
+                                       GTK_SHADOW_ETCHED_IN);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+                                  GTK_POLICY_NEVER,
+                                  GTK_POLICY_AUTOMATIC);
+  gtk_box_pack_start (GTK_BOX (box), scrolled_window, TRUE, TRUE, 0);
 
-      sw = gtk_scrolled_window_new (NULL, NULL);
-      gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (sw),
-                                           GTK_SHADOW_ETCHED_IN);
-      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
-                                      GTK_POLICY_NEVER,
-                                      GTK_POLICY_AUTOMATIC);
-      gtk_box_pack_start (GTK_BOX (box), sw, TRUE, TRUE, 0);
+  /* create tree model */
+  tree_model = create_model ();
 
-      /* create tree model */
-      tree_model = create_model ();
-
-      /* create tree view */
-      treeview = gtk_tree_view_new_with_model (tree_model);
-      gtk_tree_view_set_search_column (GTK_TREE_VIEW (treeview),
+  /* create tree view */
+   treeview = gtk_tree_view_new_with_model (tree_model);
+   gtk_tree_view_set_search_column (GTK_TREE_VIEW (treeview),
                                        COLUMN_FILENAME);
 
-      g_object_unref (tree_model);
+   g_object_unref (tree_model);
 
-      gtk_container_add (GTK_CONTAINER (sw), treeview);
+   gtk_container_add (GTK_CONTAINER (scrolled_window), treeview);
 
-      /* add columns to the tree view */
-      add_columns (GTK_TREE_VIEW (treeview));
+   /* add columns to the tree view */
+   add_columns (GTK_TREE_VIEW (treeview));
 
-      /* finish & show */
-      gtk_window_set_default_size (GTK_WINDOW (box), 280, 250);
-      g_signal_connect (box, "delete-event",
-                        G_CALLBACK (window_closed), NULL);
+   /* finish & show */
+   gtk_window_set_default_size (GTK_WINDOW (box), 280, 250);
+   g_signal_connect (box, "delete-event",
+                     G_CALLBACK (window_closed), NULL);
 
+//  char *titles[7], tempstr[50]
+//  g_printf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
 
 #if 0
    //gtk_dir_tree (GTK_CONTAINER (tree);

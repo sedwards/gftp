@@ -46,10 +46,10 @@ ftp_list_files (gftp_window_data * wdata)
     }
 
   wdata->sorted = 0;
-  sortrows (GTK_CLIST (wdata->listbox), -1, (gpointer) wdata);
+//  sortrows (GTK_CLIST (wdata->listbox), -1, (gpointer) wdata);
 
-  if (IS_NONE_SELECTED (wdata))
-    gtk_clist_select_row (GTK_CLIST (wdata->listbox), 0, 0);
+//  if (IS_NONE_SELECTED (wdata))
+//    gtk_clist_select_row (GTK_CLIST (wdata->listbox), 0, 0);
 
   return (1);
 }

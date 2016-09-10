@@ -1046,11 +1046,12 @@ CreateFTPWindow (gftp_window_data * wdata)
   intptr_t listbox_file_height, colwidth;
 
   /* Get directory or location */
-//  wdata->request = gftp_request_new ();
-//  gftp_gtk_init_request (wdata);
+  wdata->request = gftp_request_new ();
+  gftp_gtk_init_request (wdata);
 
   parent = gtk_frame_new (NULL);
 
+  /* Whole app placement and sizing */
   gftp_lookup_global_option ("listbox_file_height", &listbox_file_height);
   g_snprintf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
   gftp_lookup_global_option (tempstr, &colwidth);
@@ -1066,7 +1067,35 @@ CreateFTPWindow (gftp_window_data * wdata)
   gtk_box_pack_start (GTK_BOX (box), combo_frame, FALSE, FALSE, 0);
 
   wdata->combo = gtk_combo_box_text_new_with_entry ();
-  fill_combo_entry (wdata->combo);
+
+
+  /* Dummy fill dropdown example - Remove me */
+//  fill_combo_entry (wdata->combo);
+
+//  gtk_signal_connect (GTK_OBJECT (GTK_COMBO (wdata->combo)->entry),
+//                      "activate", GTK_SIGNAL_FUNC (chdir_edit),
+//                      (gpointer) wdata);
+ // if (*wdata->history)
+ //   gtk_combo_set_popdown_strings (GTK_COMBO (wdata->combo), *wdata->history);
+  //gtk_combo_disable_activate (GTK_COMBO (wdata->combo));
+
+//  g_print (tempstr, sizeof (tempstr), "%s_startup_directory",
+//              wdata->prefix_col_str);
+  snprintf (tempstr, sizeof (tempstr), "%s_startup_directory",
+              wdata->prefix_col_str);
+
+  gftp_lookup_global_option (tempstr, &startup_directory);
+
+  /* Populate the combo box with our path? */
+//  gtk_entry_set_text (GTK_ENTRY (GTK_COMBO (wdata->combo)->entry),
+//                      startup_directory);
+
+  wdata->hoststxt = gtk_label_new (NULL);
+  gtk_misc_set_alignment (GTK_MISC (wdata->hoststxt), 0, 0);
+  gtk_box_pack_start (GTK_BOX (box), wdata->hoststxt, FALSE, FALSE, 0);
+
+
+
   gtk_container_add (GTK_CONTAINER (combo_frame), wdata->combo);
 
   tree_frame = gtk_frame_new (NULL);
@@ -1101,12 +1130,6 @@ CreateFTPWindow (gftp_window_data * wdata)
   //                  G_CALLBACK (window_closed), NULL);
 
 #if 0
-   //gtk_dir_tree (GTK_CONTAINER (tree);
-   //view = do_list_store (window);
-   
-   //edit_box = gtk_vbox_new (FALSE, 0);
-   //gtk_container_set_border_width (GTK_CONTAINER (edit_box), 5);
-   //gtk_container_add (GTK_CONTAINER (edit_frame), edit_box);
 
   // move these back up if useful
   const GtkTargetEntry possible_types[] = {

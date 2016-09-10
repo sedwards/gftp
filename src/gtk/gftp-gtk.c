@@ -1035,7 +1035,7 @@ static GtkWidget *
 CreateFTPWindow (gftp_window_data * wdata)
 {
 
-  GtkWidget *parent, *box, *edit_frame, *edit_box, *tree, *view;
+  GtkWidget *parent, *box, *combo_frame, *tree_frame, *edit_box, *tree, *view;
   GtkComboBox *combo, *combo2;
   GtkScrolledWindow *scrolled_window;
 
@@ -1044,12 +1044,15 @@ CreateFTPWindow (gftp_window_data * wdata)
   gtk_container_border_width (GTK_CONTAINER (box), 5);
   gtk_container_add (GTK_CONTAINER (parent), box);
 
+  combo_frame = gtk_frame_new ("Editable");
+  gtk_box_pack_start (GTK_BOX (box), combo_frame, FALSE, FALSE, 0);
+
   combo = gtk_combo_box_text_new_with_entry ();
   fill_combo_entry (combo);
-  gtk_container_add (GTK_CONTAINER (box), combo);
+  gtk_container_add (GTK_CONTAINER (combo_frame), combo);
 
-  edit_frame = gtk_frame_new ("Editable");
-  gtk_box_pack_start (GTK_BOX (box), edit_frame, FALSE, FALSE, 0);
+  tree_frame = gtk_frame_new ("Editable");
+  gtk_box_pack_start (GTK_BOX (box), tree_frame, FALSE, FALSE, 0);
 
   //combo2 = gtk_combo_box_text_new_with_entry ();
   //fill_combo_entry (combo2);
@@ -1065,7 +1068,6 @@ CreateFTPWindow (gftp_window_data * wdata)
       GtkWidget *bar;
       GtkWidget *sw;
       GtkWidget *treeview;
-
 
       sw = gtk_scrolled_window_new (NULL, NULL);
       gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (sw),

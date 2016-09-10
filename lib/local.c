@@ -748,6 +748,7 @@ local_init (gftp_request * request)
     g_free (request->hostname);
   request->hostname = g_strdup (_("local filesystem"));
 
+  g_print ("reading local filesystem\n");
   return (gftp_set_config_options (request));
 }
 

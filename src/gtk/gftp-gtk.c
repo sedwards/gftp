@@ -70,6 +70,7 @@ _gftp_exit (GtkWidget * widget, gpointer data)
   ret = GTK_WIDGET (transfer_scroll)->allocation.height;
   gftp_set_global_option ("transfer_height", GINT_TO_POINTER (ret));
 
+#if 0
   ret = get_column (&GTK_CLIST (dlwdw)->column[0]);
   gftp_set_global_option ("file_trans_column", GINT_TO_POINTER (ret));
 
@@ -98,6 +99,8 @@ _gftp_exit (GtkWidget * widget, gpointer data)
   gftp_set_global_option ("remote_date_width", GINT_TO_POINTER (ret));
   ret = get_column (&GTK_CLIST (window2.listbox)->column[6]);
   gftp_set_global_option ("remote_attribs_width", GINT_TO_POINTER (ret));
+
+#endif
 
   tempstr = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (hostedit)->entry));
   gftp_set_global_option ("host_value", tempstr);
@@ -752,17 +755,363 @@ gftp_gtk_init_request (gftp_window_data * wdata)
   *wdata->filespec = '*';
 }
 
+GtkWidget *
+do_list_store (GtkWidget *do_widget);
+
+static void
+fill_combo_entry (GtkWidget *combo)
+{
+  gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "One");
+  gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "Two");
+  gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "2\302\275");
+  gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "Three");
+}
+
+GtkWidget *gftp_dir_tree(GtkWidget *tree);
+
+GtkTreeModel *tree_model = NULL;
+
+static guint timeout = 0;
+
+typedef struct
+{
+  const gchar    *type;
+  const gchar    *filename;
+  const guint     size;
+  const gchar    *user;
+  const gchar    *group;
+  const gint    date;
+  const gchar    *attribs;
+}
+Bug;
+
+enum
+{
+  COLUMN_ICON,
+  COLUMN_TYPE,
+  COLUMN_FILENAME,
+  COLUMN_SIZE,
+  COLUMN_USER,
+  COLUMN_GROUP,
+  COLUMN_DATE,
+  COLUMN_ATTRIBS,
+  NUM_COLUMNS
+};
+
+static Bug data[] =
+{
+  { "f", "somefile1", 60481, "user1", "group1", 20160912, "rxw" },
+  { "f", "somefile2", 60482, "user1", "group1", 20160912, "rwx" },
+  { "d", "somedir1", 60491, "user", "group9", 20160912, "rw-" },
+  { "d", "somedir2", 60492, "user", "group9", 20160912, "--r" },
+  { "d", "somedir3", 60482, "user", "group9", 20160912, "r-x" },
+};
+
+static GtkTreeModel *
+create_model (void)
+{
+  gint i = 0;
+  GtkListStore *store;
+  GtkTreeIter iter;
+
+  /* create list store */
+  store = gtk_list_store_new (NUM_COLUMNS,
+                              GDK_TYPE_PIXBUF,
+                              G_TYPE_STRING,    
+                              G_TYPE_STRING,
+                              G_TYPE_UINT,
+                              G_TYPE_STRING,
+                              G_TYPE_STRING,
+                              G_TYPE_UINT,
+                              G_TYPE_STRING);
+
+  /* add data to the list store */
+  for (i = 0; i < G_N_ELEMENTS (data); i++)
+    {
+      //gchar *icon_name;
+      GdkPixbuf     *icon_name;
+      gboolean sensitive;
+      GError        *error = NULL;
+
+
+      /* each type needs to be matched and we need to know the row-id of the type */
+      if (i >= 2 )
+      //  icon_name = "folder-remote-symbolic";
+          icon_name = gdk_pixbuf_new_from_file("linkdir.xpm", &error);
+      else
+        icon_name = NULL;
+      //if (i == 3)
+      //  sensitive = FALSE;
+      //else
+      //  sensitive = TRUE;
+      gtk_list_store_append (store, &iter);
+      gtk_list_store_set (store, &iter,
+                          COLUMN_TYPE, data[i].type,
+                          COLUMN_ICON, icon_name,
+                          COLUMN_FILENAME, data[i].filename,
+                          COLUMN_SIZE, data[i].size,
+                          COLUMN_USER, data[i].user,
+                          COLUMN_GROUP, data[i].group,
+                          COLUMN_DATE, data[i].date,
+                          COLUMN_ATTRIBS, data[i].attribs,
+                          -1);
+    }
+
+  return GTK_TREE_MODEL (store);
+}
+
+/*
+static void
+fixed_toggled (GtkCellRendererToggle *cell,
+               gchar                 *path_str,
+               gpointer               data)
+{
+  GtkTreeModel *tree_model = (GtkTreeModel *)data;
+  GtkTreeIter  iter;
+  GtkTreePath *path = gtk_tree_path_new_from_string (path_str);
+  gboolean fixed;
+
+  // get toggled iter 
+  gtk_tree_model_get_iter (tree_model, &iter, path);
+  gtk_tree_model_get (tree_model, &iter, COLUMN_FIXED, &fixed, -1);
+
+  // do something with the value 
+  fixed ^= 1;
+
+  // set new value 
+  gtk_list_store_set (GTK_LIST_STORE (tree_model), &iter, COLUMN_FIXED, fixed, -1);
+
+  // clean up 
+  gtk_tree_path_free (path);
+}
+*/
+
+static void
+add_columns (GtkTreeView *treeview)
+{
+  GtkCellRenderer *renderer;
+  GtkTreeViewColumn *column;
+  GtkTreeModel *tree_model = gtk_tree_view_get_model (treeview);
+
+  /* column for fixed toggles */
+/*
+  renderer = gtk_cell_renderer_toggle_new ();
+  g_signal_connect (renderer, "toggled",
+                    G_CALLBACK (fixed_toggled), tree_model);
+*/
+  /* column for symbolic icon */
+  renderer = gtk_cell_renderer_pixbuf_new ();
+  column = gtk_tree_view_column_new_with_attributes ("",
+                                                     renderer,
+                                                     "pixbuf",
+                                                     COLUMN_ICON,
+                                                     NULL);
+//  gtk_tree_view_column_set_sort_column_id (column, COLUMN_ICON);
+  gtk_tree_view_append_column (treeview, column);
+
+/*
+
+  column = gtk_tree_view_column_new_with_attributes ("Fixed?",
+                                                     renderer,
+                                                     "active", 
+                                                     COLUMN_FIXED,
+                                                     NULL);
+
+  // set this column to a fixed sizing (of 50 pixels) 
+  gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
+                                   GTK_TREE_VIEW_COLUMN_FIXED);
+  gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 50);
+  gtk_tree_view_append_column (treeview, column);
+*/
+
+  /* column for severities */
+  /*
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("Severity",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_SEVERITY,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_SEVERITY);
+  gtk_tree_view_append_column (treeview, column);
+*/
+  /* column for filename */
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_TYPE,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_TYPE);
+  gtk_tree_view_append_column (treeview, column);
+
+  /* column for filename */
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("Filename",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_FILENAME,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_FILENAME);
+  gtk_tree_view_append_column (treeview, column);
+
+  /* column for Size */
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("Size",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_SIZE,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_SIZE);
+  gtk_tree_view_append_column (treeview, column);
+
+  /* column for user */
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("User",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_USER,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_USER);
+  gtk_tree_view_append_column (treeview, column);
+
+  /* column for group */
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("Group",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_GROUP,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_GROUP);
+  gtk_tree_view_append_column (treeview, column);
+
+    /* column for date */
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("Date",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_DATE,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_DATE);
+  gtk_tree_view_append_column (treeview, column);
+
+    /* column for attrib */
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("Atribs",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_ATTRIBS,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_ATTRIBS);
+  gtk_tree_view_append_column (treeview, column);
+
+
+
+}
+
+static gboolean
+window_closed (GtkWidget *widget,
+               GdkEvent  *event,
+               gpointer   user_data)
+{
+  tree_model = NULL;
+  //window = NULL;
+  if (timeout != 0)
+    {
+      g_source_remove (timeout);
+      timeout = 0;
+    }
+  return FALSE;
+}
+
+
+
+
+
+
+
 
 static GtkWidget *
 CreateFTPWindow (gftp_window_data * wdata)
 {
+
+  GtkWidget *parent, *box, *edit_frame, *edit_box, *tree, *view;
+  GtkComboBox *combo, *combo2;
+  GtkScrolledWindow *scrolled_window;
+
+  parent = gtk_frame_new (NULL);
+  box = gtk_vbox_new (FALSE, 0);
+  gtk_container_border_width (GTK_CONTAINER (box), 5);
+  gtk_container_add (GTK_CONTAINER (parent), box);
+
+  combo = gtk_combo_box_text_new_with_entry ();
+  fill_combo_entry (combo);
+  gtk_container_add (GTK_CONTAINER (box), combo);
+
+  edit_frame = gtk_frame_new ("Editable");
+  gtk_box_pack_start (GTK_BOX (box), edit_frame, FALSE, FALSE, 0);
+
+  //combo2 = gtk_combo_box_text_new_with_entry ();
+  //fill_combo_entry (combo2);
+  //gtk_container_add (GTK_CONTAINER (box), combo2);
+
+//  tree = gftp_dir_tree (box);
+//  gtk_container_add (GTK_CONTAINER (box), tree);
+
+      GtkWidget *path_vbox;
+//      GtkWidget *vbox;
+      GtkWidget *label;
+      GtkWidget *frame;
+      GtkWidget *bar;
+      GtkWidget *sw;
+      GtkWidget *treeview;
+
+
+      sw = gtk_scrolled_window_new (NULL, NULL);
+      gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (sw),
+                                           GTK_SHADOW_ETCHED_IN);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+                                      GTK_POLICY_NEVER,
+                                      GTK_POLICY_AUTOMATIC);
+      gtk_box_pack_start (GTK_BOX (box), sw, TRUE, TRUE, 0);
+
+      /* create tree model */
+      tree_model = create_model ();
+
+      /* create tree view */
+      treeview = gtk_tree_view_new_with_model (tree_model);
+      gtk_tree_view_set_search_column (GTK_TREE_VIEW (treeview),
+                                       COLUMN_FILENAME);
+
+      g_object_unref (tree_model);
+
+      gtk_container_add (GTK_CONTAINER (sw), treeview);
+
+      /* add columns to the tree view */
+      add_columns (GTK_TREE_VIEW (treeview));
+
+      /* finish & show */
+      gtk_window_set_default_size (GTK_WINDOW (box), 280, 250);
+      g_signal_connect (box, "delete-event",
+                        G_CALLBACK (window_closed), NULL);
+
+
+#if 0
+   //gtk_dir_tree (GTK_CONTAINER (tree);
+   //view = do_list_store (window);
+   
+   //edit_box = gtk_vbox_new (FALSE, 0);
+   //gtk_container_set_border_width (GTK_CONTAINER (edit_box), 5);
+   //gtk_container_add (GTK_CONTAINER (edit_frame), edit_box);
+
+  // move these back up if useful
   const GtkTargetEntry possible_types[] = {
     {"STRING", 0, 0},
     {"text/plain", 0, 0},
     {"application/x-rootwin-drop", 0, 1}
   };
   char *titles[7], tempstr[50], *startup_directory;
-  GtkWidget *box, *scroll_list, *parent;
+  GtkWidget *scroll_list;
   intptr_t listbox_file_height, colwidth;
 
   titles[0] = "";
@@ -777,7 +1126,7 @@ CreateFTPWindow (gftp_window_data * wdata)
   gftp_gtk_init_request (wdata);
 
   parent = gtk_frame_new (NULL);
-  
+ 
   gftp_lookup_global_option ("listbox_file_height", &listbox_file_height);
   g_snprintf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
   gftp_lookup_global_option (tempstr, &colwidth);
@@ -799,8 +1148,11 @@ CreateFTPWindow (gftp_window_data * wdata)
     gtk_combo_set_popdown_strings (GTK_COMBO (wdata->combo), *wdata->history);
   gtk_combo_disable_activate (GTK_COMBO (wdata->combo));
 
+  g_printf (tempstr, sizeof (tempstr), "%s_startup_directory",
+              wdata->prefix_col_str);
   g_snprintf (tempstr, sizeof (tempstr), "%s_startup_directory",
               wdata->prefix_col_str);
+
   gftp_lookup_global_option (tempstr, &startup_directory);
   gtk_entry_set_text (GTK_ENTRY (GTK_COMBO (wdata->combo)->entry),
                       startup_directory);
@@ -809,9 +1161,11 @@ CreateFTPWindow (gftp_window_data * wdata)
   gtk_misc_set_alignment (GTK_MISC (wdata->hoststxt), 0, 0);
   gtk_box_pack_start (GTK_BOX (box), wdata->hoststxt, FALSE, FALSE, 0);
 
-  scroll_list = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll_list),
-				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+//  scroll_list = gtk_scrolled_window_new (NULL, NULL);
+//  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll_list),
+//				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+
   wdata->listbox = gtk_clist_new_with_titles (7, titles);
   gtk_container_add (GTK_CONTAINER (scroll_list), wdata->listbox);
   gtk_drag_source_set (wdata->listbox, GDK_BUTTON1_MASK, possible_types, 3,
@@ -868,6 +1222,7 @@ CreateFTPWindow (gftp_window_data * wdata)
                       (gpointer) wdata);
   gtk_signal_connect_after (GTK_OBJECT (wdata->listbox), "button_press_event",
                             GTK_SIGNAL_FUNC (list_dblclick), (gpointer) wdata);
+#endif
   return (parent);
 }
 
@@ -1358,7 +1713,7 @@ main (int argc, char **argv)
 
   gftpui_common_about (ftp_log, NULL);
 
-  gtk_timeout_add (1000, update_downloads, NULL);
+ // gtk_timeout_add (1000, update_downloads, NULL);
 
   _setup_window1 ();
   _setup_window2 (argc, argv);

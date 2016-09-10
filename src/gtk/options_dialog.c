@@ -427,6 +427,7 @@ _print_option_type_textcomboedt (gftp_config_vars * cv, void *user_data, void *v
                             NULL);
     }
 
+  g_print("Current Working directory is %s", tempstr);
   return (widdata);
 }
 

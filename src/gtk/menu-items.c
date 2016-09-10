@@ -22,6 +22,7 @@
 static void
 update_window_listbox (gftp_window_data * wdata)
 {
+#if 0
   GList * templist, * filelist;
   gftp_file * tempfle;
   int num;
@@ -47,6 +48,7 @@ update_window_listbox (gftp_window_data * wdata)
     }
   gtk_clist_thaw (GTK_CLIST (wdata->listbox));
   update_window (wdata);
+#endif
 }
 
 
@@ -226,6 +228,7 @@ deselectall (gpointer data)
 int
 chdir_edit (GtkWidget * widget, gpointer data)
 {
+#if 0
   gftp_window_data * wdata;
   const char *edttxt; 
   char *tempstr;
@@ -253,6 +256,7 @@ chdir_edit (GtkWidget * widget, gpointer data)
     add_history (wdata->combo, wdata->history, wdata->histlen, edttxt);
 
   g_free (tempstr);
+#endif
   return (0);
 }
 

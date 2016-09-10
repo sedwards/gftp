@@ -1174,16 +1174,16 @@ gftp_config_file_compare_color (gftp_config_vars * cv1, gftp_config_vars * cv2)
 static int
 gftp_config_file_read_intcombo (char *str, gftp_config_vars * cv, int line)
 {
-  char **clist;
+  char **list;
   int i;
 
   cv->value = 0;
   if (cv->listdata != NULL)
     {
-      clist = cv->listdata;
-      for (i=0; clist[i] != NULL; i++)
+      list = cv->listdata;
+      for (i=0; list[i] != NULL; i++)
         {
-          if (strcasecmp (clist[i], str) == 0)
+          if (strcasecmp (list[i], str) == 0)
             {
               cv->value = GINT_TO_POINTER(i);
               break;

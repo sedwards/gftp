@@ -81,7 +81,7 @@ typedef enum gftp_dialog_button_tag
 
 typedef struct gftp_window_data_tag
 {
-  GtkWidget *combo, 		/* Entry widget/history for the user to enter 
+  GtkComboBox *combo, 		/* Entry widget/history for the user to enter 
    				   a directory */
             *hoststxt, 		/* Show which directory we're in */
             *listbox; 		/* Our listbox showing the files */

@@ -619,6 +619,7 @@ check_reconnect (gftp_window_data *wdata)
 void
 add_file_listbox (gftp_window_data * wdata, gftp_file * fle)
 {
+#if 0
   char *add_data[7] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
   char *tempstr, *str, *pos, *attribs;
   gftp_config_list_vars * tmplistvar;
@@ -716,7 +717,7 @@ add_file_listbox (gftp_window_data * wdata, gftp_file * fle)
   attribs = gftp_convert_attributes_from_mode_t (fle->st_mode);
   gtk_clist_set_text (GTK_CLIST (wdata->listbox), clist_num, 6, attribs);
   g_free (attribs);
-
+#endif
 }
 
 

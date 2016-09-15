@@ -759,12 +759,14 @@ GtkWidget *
 do_list_store (GtkWidget *do_widget);
 
 static void
-fill_combo_entry (GtkWidget *combo)
+combo_history (GtkWidget *combo)
 {
-  gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "One");
+  gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "");
+/*  gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "One");
   gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "Two");
   gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "2\302\275");
   gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "Three");
+*/
 }
 
 GtkWidget *gftp_dir_tree(GtkWidget *tree);
@@ -780,10 +782,9 @@ typedef struct
   const guint     size;
   const gchar    *user;
   const gchar    *group;
-  const gint    date;
+  const gint     date;
   const gchar    *attribs;
-}
-Bug;
+} columns;
 
 enum
 {
@@ -798,7 +799,7 @@ enum
   NUM_COLUMNS
 };
 
-static Bug data[] =
+static columns data[] =
 {
   { "f", "somefile1", 60481, "user1", "group1", 20160912, "rxw" },
   { "f", "somefile2", 60482, "user1", "group1", 20160912, "rwx" },
@@ -825,6 +826,7 @@ create_model (void)
                               G_TYPE_UINT,
                               G_TYPE_STRING);
 
+#if 0
   /* add data to the list store */
   for (i = 0; i < G_N_ELEMENTS (data); i++)
     {
@@ -856,6 +858,7 @@ create_model (void)
                           COLUMN_ATTRIBS, data[i].attribs,
                           -1);
     }
+#endif
 
   return GTK_TREE_MODEL (store);
 }
@@ -899,6 +902,7 @@ add_columns (GtkTreeView *treeview)
   g_signal_connect (renderer, "toggled",
                     G_CALLBACK (fixed_toggled), tree_model);
 */
+
   /* column for symbolic icon */
   renderer = gtk_cell_renderer_pixbuf_new ();
   column = gtk_tree_view_column_new_with_attributes ("",
@@ -907,35 +911,10 @@ add_columns (GtkTreeView *treeview)
                                                      COLUMN_ICON,
                                                      NULL);
 //  gtk_tree_view_column_set_sort_column_id (column, COLUMN_ICON);
+  gtk_tree_view_column_set_resizable(column, FALSE);
   gtk_tree_view_append_column (treeview, column);
 
-/*
-
-  column = gtk_tree_view_column_new_with_attributes ("Fixed?",
-                                                     renderer,
-                                                     "active", 
-                                                     COLUMN_FIXED,
-                                                     NULL);
-
-  // set this column to a fixed sizing (of 50 pixels) 
-  gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
-                                   GTK_TREE_VIEW_COLUMN_FIXED);
-  gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 50);
-  gtk_tree_view_append_column (treeview, column);
-*/
-
-  /* column for severities */
-  /*
-  renderer = gtk_cell_renderer_text_new ();
-  column = gtk_tree_view_column_new_with_attributes ("Severity",
-                                                     renderer,
-                                                     "text",
-                                                     COLUMN_SEVERITY,
-                                                     NULL);
-  gtk_tree_view_column_set_sort_column_id (column, COLUMN_SEVERITY);
-  gtk_tree_view_append_column (treeview, column);
-*/
-  /* column for filename */
+  /* type */
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes ("",
                                                      renderer,
@@ -943,9 +922,10 @@ add_columns (GtkTreeView *treeview)
                                                      COLUMN_TYPE,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_TYPE);
+  gtk_tree_view_column_set_resizable(column, FALSE);
   gtk_tree_view_append_column (treeview, column);
 
-  /* column for filename */
+  /* filename */
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes ("Filename",
                                                      renderer,
@@ -953,9 +933,10 @@ add_columns (GtkTreeView *treeview)
                                                      COLUMN_FILENAME,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_FILENAME);
+  gtk_tree_view_column_set_resizable(column, TRUE);
   gtk_tree_view_append_column (treeview, column);
 
-  /* column for Size */
+  /* size */
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes ("Size",
                                                      renderer,
@@ -963,9 +944,10 @@ add_columns (GtkTreeView *treeview)
                                                      COLUMN_SIZE,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_SIZE);
+  gtk_tree_view_column_set_resizable(column, TRUE);
   gtk_tree_view_append_column (treeview, column);
 
-  /* column for user */
+  /* user */
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes ("User",
                                                      renderer,
@@ -973,9 +955,10 @@ add_columns (GtkTreeView *treeview)
                                                      COLUMN_USER,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_USER);
+  gtk_tree_view_column_set_resizable(column, TRUE);
   gtk_tree_view_append_column (treeview, column);
 
-  /* column for group */
+  /* group */
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes ("Group",
                                                      renderer,
@@ -983,9 +966,10 @@ add_columns (GtkTreeView *treeview)
                                                      COLUMN_GROUP,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_GROUP);
+  gtk_tree_view_column_set_resizable(column, TRUE);
   gtk_tree_view_append_column (treeview, column);
 
-    /* column for date */
+  /* date */
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes ("Date",
                                                      renderer,
@@ -993,9 +977,10 @@ add_columns (GtkTreeView *treeview)
                                                      COLUMN_DATE,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_DATE);
+  gtk_tree_view_column_set_resizable(column, TRUE);
   gtk_tree_view_append_column (treeview, column);
 
-    /* column for attrib */
+  /* attributes */
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes ("Atribs",
                                                      renderer,
@@ -1003,10 +988,8 @@ add_columns (GtkTreeView *treeview)
                                                      COLUMN_ATTRIBS,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_ATTRIBS);
+  gtk_tree_view_column_set_resizable(column, TRUE);
   gtk_tree_view_append_column (treeview, column);
-
-
-
 }
 
 static gboolean
@@ -1015,7 +998,6 @@ window_closed (GtkWidget *widget,
                gpointer   user_data)
 {
   tree_model = NULL;
-  //window = NULL;
   if (timeout != 0)
     {
       g_source_remove (timeout);
@@ -1029,8 +1011,6 @@ window_closed (GtkWidget *widget,
 
 
 
-
-
 static GtkWidget *
 CreateFTPWindow (gftp_window_data * wdata)
 {
@@ -1038,7 +1018,6 @@ CreateFTPWindow (gftp_window_data * wdata)
   GtkWidget *tree, *treeview, *view;
 
   GtkComboBox *combo, *combo2;
-  //GtkScrolledWindow *scrolled_window;
   GtkWidget *scrolled_window;
 
   char *titles[7], tempstr[50], *startup_directory;
@@ -1068,14 +1047,15 @@ CreateFTPWindow (gftp_window_data * wdata)
 
   wdata->combo = gtk_combo_box_text_new_with_entry ();
 
-
   /* Dummy fill dropdown example - Remove me */
-//  fill_combo_entry (wdata->combo);
+  combo_history (wdata->combo);
 
 //  gtk_signal_connect (GTK_OBJECT (GTK_COMBO (wdata->combo)->entry),
 //                      "activate", GTK_SIGNAL_FUNC (chdir_edit),
 //                      (gpointer) wdata);
- // if (*wdata->history)
+  if (*wdata->history)
+     g_print("wdata->history %s", wdata->history);
+
  //   gtk_combo_set_popdown_strings (GTK_COMBO (wdata->combo), *wdata->history);
   //gtk_combo_disable_activate (GTK_COMBO (wdata->combo));
 
@@ -1089,6 +1069,8 @@ CreateFTPWindow (gftp_window_data * wdata)
   /* Populate the combo box with our path? */
 //  gtk_entry_set_text (GTK_ENTRY (GTK_COMBO (wdata->combo)->entry),
 //                      startup_directory);
+
+  g_print("Startup Directory is: %s\n", startup_directory);
 
   wdata->hoststxt = gtk_label_new (NULL);
   gtk_misc_set_alignment (GTK_MISC (wdata->hoststxt), 0, 0);
@@ -1649,8 +1631,14 @@ _setup_window1 ()
     {
       gftp_setup_startup_directory (window1.request,
                                     "local_startup_directory");
+
+      g_print("gftp_setup_startup_directory should be set to local_startup_directory for window 1\n");
+
       gftp_connect (window1.request);
+      g_print("gftp connect window 1\n");
+
       ftp_list_files (&window1);
+      g_print("list files for window 1\n");
     }
 }
 

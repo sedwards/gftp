@@ -70,6 +70,14 @@ gftpui_refresh (void *uidata, int clear_cache_entry)
   ftp_list_files (wdata);
   gtk_clist_thaw (GTK_CLIST (wdata->listbox));
 
+#if 0
+  int i;
+  for (i = 0; i < G_N_ELEMENTS (wdata->listbox); i++)
+    { 
+     g_print("Listbox Elements %s\n", wdata->listbox);
+    }
+#endif
+
   wdata->request->refreshing = 0;
 }
 

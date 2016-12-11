@@ -70,37 +70,7 @@ _gftp_exit (GtkWidget * widget, gpointer data)
   ret = GTK_WIDGET (transfer_scroll)->allocation.height;
   gftp_set_global_option ("transfer_height", GINT_TO_POINTER (ret));
 
-#if 0
-  ret = get_column (&GTK_CLIST (dlwdw)->column[0]);
-  gftp_set_global_option ("file_trans_column", GINT_TO_POINTER (ret));
 
-  ret = get_column (&GTK_CLIST (window1.listbox)->column[1]);
-  gftp_set_global_option ("local_file_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window1.listbox)->column[2]);
-  gftp_set_global_option ("local_size_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window1.listbox)->column[3]);
-  gftp_set_global_option ("local_user_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window1.listbox)->column[4]);
-  gftp_set_global_option ("local_group_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window1.listbox)->column[5]);
-  gftp_set_global_option ("local_date_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window1.listbox)->column[6]);
-  gftp_set_global_option ("local_attribs_width", GINT_TO_POINTER (ret));
-
-  ret = get_column (&GTK_CLIST (window2.listbox)->column[1]);
-  gftp_set_global_option ("remote_file_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window2.listbox)->column[2]);
-  gftp_set_global_option ("remote_size_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window2.listbox)->column[3]);
-  gftp_set_global_option ("remote_user_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window2.listbox)->column[4]);
-  gftp_set_global_option ("remote_group_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window2.listbox)->column[5]);
-  gftp_set_global_option ("remote_date_width", GINT_TO_POINTER (ret));
-  ret = get_column (&GTK_CLIST (window2.listbox)->column[6]);
-  gftp_set_global_option ("remote_attribs_width", GINT_TO_POINTER (ret));
-
-#endif
 
   tempstr = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (hostedit)->entry));
   gftp_set_global_option ("host_value", tempstr);
@@ -1248,6 +1218,9 @@ menu_mouse_click (GtkWidget * widget, GdkEventButton * event, gpointer data)
   return (FALSE);
 }
 
+GtkWidget *
+do_button_box ();
+
 
 static GtkWidget *
 CreateFTPWindows (GtkWidget * ui)
@@ -1316,8 +1289,9 @@ CreateFTPWindows (GtkWidget * ui)
   gtk_paned_pack1 (GTK_PANED (winpane), box, 1, 1);
 
   window2.prefix_col_str = "remote";
-  remote_frame = CreateFTPWindow (&window2);
-
+  //remote_frame = CreateFTPWindow (&window2);
+  remote_frame = do_button_box ();
+    
   gtk_paned_pack2 (GTK_PANED (winpane), remote_frame, 1, 1);
 
   dlpane = gtk_vpaned_new ();

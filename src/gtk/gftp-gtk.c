@@ -231,11 +231,12 @@ gftp_gtk_refresh (gftp_window_data * wdata)
 static GtkWidget *
 CreateMenus (GtkWidget * parent)
 {
+#if 0
   int local_len, remote_len, len, i, trans_len, log_len, tools_len, log_start;
   GtkAccelGroup * accel_group;
   intptr_t ascii_transfers;
   GtkWidget * tempwid;
-#if 0
+
     static GtkItemFactoryEntry menu_items[] = {
     {N_("/_FTP"), NULL, 0, 0, MN_("<Branch>")},
     {N_("/FTP/tearoff"), NULL, 0, 0, MN_("<Tearoff>")},
@@ -408,7 +409,7 @@ CreateMenus (GtkWidget * parent)
 
   tempwid = gtk_item_factory_get_widget (factory, "/FTP/Window 2");
   gtk_check_menu_item_set_state (GTK_CHECK_MENU_ITEM (tempwid), TRUE);
-#endif
+
 //  window1.ifactory = item_factory_new (GTK_TYPE_MENU, "<local>", NULL, "/Local");
 //  create_item_factory (window1.ifactory, local_len - 2, menu_items + local_start + 2, &window1);
 
@@ -422,6 +423,7 @@ CreateMenus (GtkWidget * parent)
 //  create_item_factory (dl_factory, trans_len - 2, menu_items + trans_start + 2, NULL);
 
 //  return (factory->widget);
+#endif
 }
 
 
@@ -1039,8 +1041,8 @@ CreateFTPWindow (gftp_window_data * wdata)
 
 //  g_print (tempstr, sizeof (tempstr), "%s_startup_directory",
 //              wdata->prefix_col_str);
-  snprintf (tempstr, sizeof (tempstr), "%s_startup_directory",
-              wdata->prefix_col_str);
+ // snprintf (tempstr, sizeof (tempstr), "%s_startup_directory",
+   //           wdata->prefix_col_str);
 
   //gftp_lookup_global_option (tempstr, &startup_directory);
 
@@ -1085,7 +1087,7 @@ CreateFTPWindow (gftp_window_data * wdata)
   add_columns (GTK_TREE_VIEW (treeview));
 
   /* finish & show */
-  gtk_window_set_default_size (GTK_WINDOW (box), 280, 250);
+  gtk_window_set_default_size (GTK_WINDOW (box), 640, 480);
   //g_signal_connect (box, "delete-event",
   //                  G_CALLBACK (window_closed), NULL);
 
@@ -1232,6 +1234,8 @@ do_button_box ();
 GtkWidget *
 do_providers_tree ();
 
+GtkWidget *
+do_menus ();
 
 static GtkWidget *
 CreateFTPWindows (GtkWidget * ui)
@@ -1256,10 +1260,10 @@ CreateFTPWindows (GtkWidget * ui)
 //  window2.history = &tmplistvar->list;
  // window2.histlen = &tmplistvar->num_items;
  
-  mainvbox = gtk_vbox_new (FALSE, 0);
+  mainvbox = gtk_box_new (FALSE, 0);
 
- // tempwid = CreateMenus (ui);
- // gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
+  tempwid = do_menus();
+  gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
 
   //tempwid = CreateConnectToolbar (ui);
   //gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
@@ -1267,7 +1271,7 @@ CreateFTPWindows (GtkWidget * ui)
   //tempwid = CreateCommandToolbar ();
   //gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
 
-  winpane = gtk_hpaned_new ();
+  winpane = gtk_paned_new (GTK_ORIENTATION_HORIZONTAL);
 
   box = gtk_hbox_new (FALSE, 0);
 
@@ -1277,27 +1281,29 @@ CreateFTPWindows (GtkWidget * ui)
 
   gtk_box_pack_start (GTK_BOX (box), local_frame, TRUE, TRUE, 0);
 
+//gtk_box_pack_start (GTK_BOX (mainvbox), box, TRUE, TRUE, 0);
+    
   dlbox = gtk_vbox_new (FALSE, 0);
   //gtk_container_border_width (GTK_CONTAINER (dlbox), 5);
-  gtk_box_pack_start (GTK_BOX (box), dlbox, FALSE, FALSE, 0);
+//  gtk_box_pack_start (GTK_BOX (box), dlbox, FALSE, FALSE, 0);
 
-  tempwid = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD,
-                                      GTK_ICON_SIZE_SMALL_TOOLBAR);
+//  tempwid = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD,
+ //                                     GTK_ICON_SIZE_SMALL_TOOLBAR);
 
-  upload_right_arrow = gtk_button_new ();
-  gtk_box_pack_start (GTK_BOX (dlbox), upload_right_arrow, TRUE, FALSE, 0);
+  //upload_right_arrow = gtk_button_new ();
+  //gtk_box_pack_start (GTK_BOX (dlbox), upload_right_arrow, TRUE, FALSE, 0);
 //  g_signal_connect_object (G_OBJECT (upload_right_arrow), "clicked",
 //			     G_SIGNAL_FUNC (put_files), NULL);
-  gtk_container_add (GTK_CONTAINER (upload_right_arrow), tempwid);
+ // gtk_container_add (GTK_CONTAINER (upload_right_arrow), tempwid);
 
-  tempwid = gtk_image_new_from_stock (GTK_STOCK_GO_BACK,
-                                      GTK_ICON_SIZE_SMALL_TOOLBAR);
+//  tempwid = gtk_image_new_from_stock (GTK_STOCK_GO_BACK,
+//                                      GTK_ICON_SIZE_SMALL_TOOLBAR);
 
-  download_left_arrow = gtk_button_new ();
-  gtk_box_pack_start (GTK_BOX (dlbox), download_left_arrow, TRUE, FALSE, 0);
+  //download_left_arrow = gtk_button_new ();
+  //gtk_box_pack_start (GTK_BOX (dlbox), download_left_arrow, TRUE, FALSE, 0);
 //  gtk_signal_connect_object (G_OBJECT (download_left_arrow), "clicked",
 ///			     G_SIGNAL_FUNC (get_files), NULL);
-  gtk_container_add (GTK_CONTAINER (download_left_arrow), tempwid);
+ // gtk_container_add (GTK_CONTAINER (download_left_arrow), tempwid);
 
   gtk_paned_pack1 (GTK_PANED (winpane), box, 1, 1);
 
@@ -1718,11 +1724,13 @@ main (int argc, char **argv)
   current_wdata = &window2;
   ui = CreateFTPWindows (window);
   gtk_container_add (GTK_CONTAINER (window), ui);
+          gtk_window_set_default_size (GTK_WINDOW (window),
+                                      800, 600);
   gtk_widget_show (window);
 
-  gtk_window_set_gravity (window, GDK_GRAVITY_CENTER);
-  gtk_window_move (window, gdk_screen_width()/6, gdk_screen_height()/6) ;
-  gtk_window_move (window, 0, 0) ;
+//  gtk_window_set_gravity (window, GDK_GRAVITY_CENTER);
+//  gtk_window_move (window, gdk_screen_width()/6, gdk_screen_height()/6) ;
+//  gtk_window_move (window, 0, 0) ;
 
   //gftpui_common_about (ftp_log, NULL);
 

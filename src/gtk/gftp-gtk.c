@@ -19,7 +19,7 @@
 
 #include "gftp-gtk.h"
 
-static GtkItemFactory *log_factory, *dl_factory;
+//static GtkItemFactory *log_factory, *dl_factory;
 static GtkWidget * local_frame, * remote_frame, * log_table, * transfer_scroll,
                  * gftpui_command_toolbar, * protocol_menu;
 
@@ -27,18 +27,19 @@ gftp_window_data window1, window2, *other_wdata, *current_wdata;
 GtkWidget * stop_btn, * hostedit, * useredit, * passedit, * portedit, * logwdw,
           * dlwdw, * optionmenu, * gftpui_command_widget, * download_left_arrow,
           * upload_right_arrow, * openurl_btn;
-GtkTooltips * openurl_tooltip;
+//GtkTooltips * openurl_tooltip;
 GtkAdjustment * logwdw_vadj;
 GtkTextMark * logwdw_textmark;
 int local_start, remote_start, trans_start;
 GHashTable * graphic_hash_table = NULL;
-GtkItemFactoryEntry * menus = NULL;
-GtkItemFactory * factory = NULL;
+//GtkItemFactoryEntry * menus = NULL;
+//GtkItemFactory * factory = NULL;
 pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
 gftp_graphic * gftp_icon;
 pthread_t main_thread_id;
 GList * viewedit_processes = NULL;
 
+#if 0
 static int
 get_column (GtkCListColumn * col)
 {
@@ -49,12 +50,13 @@ get_column (GtkCListColumn * col)
   else
     return (col->width);
 }
-
+#endif
 
 static void
 _gftp_exit (GtkWidget * widget, gpointer data)
 {
-  intptr_t remember_last_directory;
+#if 0
+    intptr_t remember_last_directory;
   const char *tempstr;
   GtkWidget * tempwid;
   intptr_t ret;
@@ -78,9 +80,10 @@ _gftp_exit (GtkWidget * widget, gpointer data)
   tempstr = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (portedit)->entry));
   gftp_set_global_option ("port_value", tempstr);
 
-  tempstr = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (useredit)->entry));
-  gftp_set_global_option ("user_value", tempstr);
+//  tempstr = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (useredit)->entry));
+ // gftp_set_global_option ("user_value", tempstr);
 
+#if 0
   gftp_lookup_global_option ("remember_last_directory",
                              &remember_last_directory);
   if (remember_last_directory)
@@ -91,12 +94,13 @@ _gftp_exit (GtkWidget * widget, gpointer data)
       tempstr = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (window2.combo)->entry));
       gftp_set_global_option ("remote_startup_directory", tempstr);
     }
-
+#endif
   tempwid = gtk_menu_get_active (GTK_MENU (protocol_menu));
-  ret = GPOINTER_TO_INT (gtk_object_get_user_data (GTK_OBJECT (tempwid)));
+  ret = GPOINTER_TO_INT (gtk_object_get_user_data (G_OBJECT (tempwid)));
   gftp_set_global_option ("default_protocol", gftp_protocols[ret].name);
 
   gftp_shutdown ();
+#endif
   exit (0);
 }
 
@@ -206,7 +210,7 @@ tb_openurl_dialog (gpointer data)
       return;
     }
 
-  edttxt = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (hostedit)->entry));
+//  edttxt = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (hostedit)->entry));
 
   if (GFTP_IS_CONNECTED (current_wdata->request))
     gftpui_disconnect (current_wdata);
@@ -231,7 +235,8 @@ CreateMenus (GtkWidget * parent)
   GtkAccelGroup * accel_group;
   intptr_t ascii_transfers;
   GtkWidget * tempwid;
-  static GtkItemFactoryEntry menu_items[] = {
+#if 0
+    static GtkItemFactoryEntry menu_items[] = {
     {N_("/_FTP"), NULL, 0, 0, MN_("<Branch>")},
     {N_("/FTP/tearoff"), NULL, 0, 0, MN_("<Tearoff>")},
     {N_("/FTP/Window _1"), "<control>1", change_setting, GFTP_MENU_ITEM_WIN1,
@@ -387,7 +392,6 @@ CreateMenus (GtkWidget * parent)
   create_item_factory (factory, 3, menu_items + i, NULL);
 
   build_bookmarks_menu ();
-
   gtk_window_add_accel_group (GTK_WINDOW (parent), accel_group);
 
   gftp_lookup_global_option ("ascii_transfers", &ascii_transfers);
@@ -404,20 +408,20 @@ CreateMenus (GtkWidget * parent)
 
   tempwid = gtk_item_factory_get_widget (factory, "/FTP/Window 2");
   gtk_check_menu_item_set_state (GTK_CHECK_MENU_ITEM (tempwid), TRUE);
+#endif
+//  window1.ifactory = item_factory_new (GTK_TYPE_MENU, "<local>", NULL, "/Local");
+//  create_item_factory (window1.ifactory, local_len - 2, menu_items + local_start + 2, &window1);
 
-  window1.ifactory = item_factory_new (GTK_TYPE_MENU, "<local>", NULL, "/Local");
-  create_item_factory (window1.ifactory, local_len - 2, menu_items + local_start + 2, &window1);
+//  window2.ifactory = item_factory_new (GTK_TYPE_MENU, "<remote>", NULL, "/Remote");
+//  create_item_factory (window2.ifactory, remote_len - 2, menu_items + remote_start + 2, &window2);
 
-  window2.ifactory = item_factory_new (GTK_TYPE_MENU, "<remote>", NULL, "/Remote");
-  create_item_factory (window2.ifactory, remote_len - 2, menu_items + remote_start + 2, &window2);
+//  log_factory = item_factory_new (GTK_TYPE_MENU, "<log>", NULL, "/Logging");
+//  create_item_factory (log_factory, log_len - 2, menu_items + log_start + 2, NULL);
 
-  log_factory = item_factory_new (GTK_TYPE_MENU, "<log>", NULL, "/Logging");
-  create_item_factory (log_factory, log_len - 2, menu_items + log_start + 2, NULL);
+//  dl_factory = item_factory_new (GTK_TYPE_MENU, "<download>", NULL, "/Transfer");
+//  create_item_factory (dl_factory, trans_len - 2, menu_items + trans_start + 2, NULL);
 
-  dl_factory = item_factory_new (GTK_TYPE_MENU, "<download>", NULL, "/Transfer");
-  create_item_factory (dl_factory, trans_len - 2, menu_items + trans_start + 2, NULL);
-
-  return (factory->widget);
+//  return (factory->widget);
 }
 
 
@@ -438,17 +442,17 @@ CreateConnectToolbar (GtkWidget * parent)
 
   box = gtk_hbox_new (FALSE, 4);
   gtk_container_add (GTK_CONTAINER (toolbar), box);
-  gtk_container_border_width (GTK_CONTAINER (box), 5);
-
+ // gtk_container_border_width (GTK_CONTAINER (box), 5);
+#if 0
   openurl_tooltip = gtk_tooltips_new ();
 
   tempwid = toolbar_image (parent, "connect.xpm");
   openurl_btn = gtk_button_new ();
   gtk_container_add (GTK_CONTAINER (openurl_btn), tempwid);
-  gtk_signal_connect_object (GTK_OBJECT (openurl_btn), "clicked",
-			     GTK_SIGNAL_FUNC (tb_openurl_dialog), NULL);
-  gtk_signal_connect (GTK_OBJECT (openurl_btn), "drag_data_received",
-		      GTK_SIGNAL_FUNC (openurl_get_drag_data), NULL);
+  gtk_signal_connect_object (G_OBJECT (openurl_btn), "clicked",
+			     G_SIGNAL_FUNC (tb_openurl_dialog), NULL);
+  gtk_signal_connect (G_OBJECT (openurl_btn), "drag_data_received",
+		      G_SIGNAL_FUNC (openurl_get_drag_data), NULL);
   gtk_drag_dest_set (openurl_btn, GTK_DEST_DEFAULT_ALL, possible_types, 2,
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE);
   gtk_container_border_width (GTK_CONTAINER (openurl_btn), 1);
@@ -462,8 +466,8 @@ CreateConnectToolbar (GtkWidget * parent)
   gtk_combo_set_case_sensitive (GTK_COMBO (hostedit), 1);
   gtk_widget_set_size_request (hostedit, 130, -1);
 
-  gtk_signal_connect (GTK_OBJECT (GTK_COMBO (hostedit)->entry), "activate",
-		      GTK_SIGNAL_FUNC (toolbar_hostedit), NULL);
+  gtk_signal_connect (G_OBJECT (GTK_COMBO (hostedit)->entry), "activate",
+		      G_SIGNAL_FUNC (toolbar_hostedit), NULL);
 
   gftp_lookup_global_option ("hosthistory", &tmplistvar);
   if (tmplistvar->list)
@@ -485,8 +489,8 @@ CreateConnectToolbar (GtkWidget * parent)
   gtk_combo_set_case_sensitive (GTK_COMBO (portedit), 1);
   gtk_widget_set_size_request (portedit, 50, -1);
 
-  gtk_signal_connect (GTK_OBJECT (GTK_COMBO (portedit)->entry), "activate",
-		      GTK_SIGNAL_FUNC (toolbar_hostedit), NULL);
+  gtk_signal_connect (G_OBJECT (GTK_COMBO (portedit)->entry), "activate",
+		      G_SIGNAL_FUNC (toolbar_hostedit), NULL);
 
   gftp_lookup_global_option ("porthistory", &tmplistvar);
   if (tmplistvar->list)
@@ -505,8 +509,8 @@ CreateConnectToolbar (GtkWidget * parent)
   gtk_combo_set_case_sensitive (GTK_COMBO (useredit), 1);
   gtk_widget_set_size_request (useredit, 75, -1);
 
-  gtk_signal_connect (GTK_OBJECT (GTK_COMBO (useredit)->entry), "activate",
-		      GTK_SIGNAL_FUNC (toolbar_hostedit), NULL);
+  gtk_signal_connect (G_OBJECT (GTK_COMBO (useredit)->entry), "activate",
+		      G_SIGNAL_FUNC (toolbar_hostedit), NULL);
 
   gftp_lookup_global_option ("userhistory", &tmplistvar);
   if (tmplistvar->list)
@@ -527,8 +531,8 @@ CreateConnectToolbar (GtkWidget * parent)
   gtk_widget_set_size_request (passedit, 55, -1);
 
   gtk_entry_set_visibility (GTK_ENTRY (passedit), FALSE);
-  gtk_signal_connect (GTK_OBJECT (passedit), "activate",
-		      GTK_SIGNAL_FUNC (toolbar_hostedit), NULL);
+  gtk_signal_connect (G_OBJECT (passedit), "activate",
+		      G_SIGNAL_FUNC (toolbar_hostedit), NULL);
   gtk_box_pack_start (GTK_BOX (box), passedit, FALSE, FALSE, 0);
 
   tempwid = gtk_vbox_new (FALSE, 0);
@@ -552,7 +556,7 @@ CreateConnectToolbar (GtkWidget * parent)
       j++;
 
       tempwid = gtk_menu_item_new_with_label (gftp_protocols[i].name);
-      gtk_object_set_user_data (GTK_OBJECT (tempwid), GINT_TO_POINTER(i));
+      gtk_object_set_user_data (G_OBJECT (tempwid), GINT_TO_POINTER(i));
       gtk_menu_append (GTK_MENU (protocol_menu), tempwid);
       gtk_widget_show (tempwid);
     }
@@ -566,13 +570,13 @@ CreateConnectToolbar (GtkWidget * parent)
 
   gtk_container_add (GTK_CONTAINER (stop_btn), tempwid);
   gtk_widget_set_sensitive (stop_btn, 0);
-  gtk_signal_connect_object (GTK_OBJECT (stop_btn), "clicked",
-			     GTK_SIGNAL_FUNC (stop_button), NULL);
-  gtk_container_border_width (GTK_CONTAINER (stop_btn), 1);
+//  gtk_signal_connect_object (G_OBJECT (stop_btn), "clicked",
+//			     G_SIGNAL_FUNC (stop_button), NULL);
+  //gtk_container_border_width (GTK_CONTAINER (stop_btn), 1);
   gtk_box_pack_start (GTK_BOX (box), stop_btn, FALSE, FALSE, 0);
 
   gtk_widget_grab_focus (GTK_COMBO (hostedit)->entry);
-
+#endif
   return (toolbar);
 }
 
@@ -586,15 +590,15 @@ CreateCommandToolbar (void)
 
   box = gtk_hbox_new (FALSE, 4);
   gtk_container_add (GTK_CONTAINER (gftpui_command_toolbar), box);
-  gtk_container_border_width (GTK_CONTAINER (box), 5);
+  //gtk_container_border_width (GTK_CONTAINER (box), 5);
 
   tempwid = gtk_label_new (_("Command: "));
   gtk_box_pack_start (GTK_BOX (box), tempwid, FALSE, FALSE, 0);
 
   gftpui_command_widget = gtk_entry_new ();
   gtk_box_pack_start (GTK_BOX (box), gftpui_command_widget, TRUE, TRUE, 0);
-  gtk_signal_connect (GTK_OBJECT (gftpui_command_widget), "activate",
-		      GTK_SIGNAL_FUNC (gftpui_run_command), NULL);
+//  g_signal_connect (G_OBJECT (gftpui_command_widget), "activate",
+//		      G_SIGNAL_FUNC (gftpui_run_command), NULL);
 
   return (gftpui_command_toolbar);
 }
@@ -603,18 +607,21 @@ CreateCommandToolbar (void)
 static void
 setup_column (GtkWidget * listbox, int column, int width)
 {
+#if 0
   if (width == 0)
     gtk_clist_set_column_auto_resize (GTK_CLIST (listbox), column, TRUE);
   else if (width == -1)
     gtk_clist_set_column_visibility (GTK_CLIST (listbox), column, FALSE);
   else
     gtk_clist_set_column_width (GTK_CLIST (listbox), column, width);
+#endif
 }
 
 
 static void
 list_doaction (gftp_window_data * wdata)
 {
+#if 0
   intptr_t list_dblclk_action;
   GList *templist, *filelist;
   gftp_file *tempfle;
@@ -624,11 +631,11 @@ list_doaction (gftp_window_data * wdata)
   gftp_lookup_request_option (wdata->request, "list_dblclk_action", 
                               &list_dblclk_action);
 
-  filelist = wdata->files;
+//  filelist = wdata->files;
   templist = gftp_gtk_get_list_selection (wdata);
   num = 0;
   templist = get_next_selection (templist, &filelist, &num);
-  tempfle = (gftp_file *) filelist->data;
+ // tempfle = (gftp_file *) filelist->data;
 
   if (check_reconnect (wdata) < 0) 
     return;
@@ -661,6 +668,7 @@ list_doaction (gftp_window_data * wdata)
             break;
         }
     }
+#endif
 }
 
 
@@ -673,18 +681,18 @@ list_enter (GtkWidget * widget, GdkEventKey * event, gpointer data)
   if (!GFTP_IS_CONNECTED (wdata->request))
     return (TRUE);
 
-  if (event->type == GDK_KEY_PRESS && 
-           (event->keyval == GDK_KP_Delete || event->keyval == GDK_Delete))
-    {
-      delete_dialog (wdata);
-      return (FALSE);
-    }
-  else if (IS_ONE_SELECTED (wdata) && event->type == GDK_KEY_PRESS && 
-      event->keyval == GDK_Return)
-    {
-      list_doaction (wdata);
-      return (FALSE);
-    }
+//  if (event->type == GDK_KEY_PRESS &&
+//           (event->keyval == GDK_KP_Delete || event->keyval == GDK_Delete))
+  //  {
+    //  delete_dialog (wdata);
+      //return (FALSE);
+    //}
+//  else if (IS_ONE_SELECTED (wdata) && event->type == GDK_KEY_PRESS &&
+  //    event->keyval == GDK_Return)
+   // {
+   //   list_doaction (wdata);
+     // return (FALSE);
+ //   }
   return (TRUE);
 }
 
@@ -696,9 +704,9 @@ list_dblclick (GtkWidget * widget, GdkEventButton * event, gpointer data)
 
   wdata = data;
 
-  if (event->button == 3)
-    gtk_item_factory_popup (wdata->ifactory, (guint) event->x_root,
-                            (guint) event->y_root, 3, event->time);
+ // if (event->button == 3)
+//    gtk_item_factory_popup (wdata->ifactory, (guint) event->x_root,
+  //                          (guint) event->y_root, 3, event->time);
   return (FALSE);
 }
 
@@ -1001,30 +1009,30 @@ CreateFTPWindow (gftp_window_data * wdata)
   parent = gtk_frame_new (NULL);
 
   /* Whole app placement and sizing */
-  gftp_lookup_global_option ("listbox_file_height", &listbox_file_height);
-  g_snprintf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
-  gftp_lookup_global_option (tempstr, &colwidth);
-  gtk_widget_set_size_request (parent, colwidth, listbox_file_height);
+  //gftp_lookup_global_option ("listbox_file_height", &listbox_file_height);
+  //g_snprintf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
+  //gftp_lookup_global_option (tempstr, &colwidth);
+  //gtk_widget_set_size_request (parent, colwidth, listbox_file_height);
 
-  gtk_container_border_width (GTK_CONTAINER (parent), 5);
+  //gtk_container_border_width (GTK_CONTAINER (parent), 5);
 
   box = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (box), 5);
+  //gtk_container_border_width (GTK_CONTAINER (box), 5);
   gtk_container_add (GTK_CONTAINER (parent), box);
 
   combo_frame = gtk_frame_new (NULL);
   gtk_box_pack_start (GTK_BOX (box), combo_frame, FALSE, FALSE, 0);
 
-  wdata->combo = gtk_combo_box_text_new_with_entry ();
+ // wdata->combo = gtk_combo_box_text_new_with_entry ();
 
   /* Dummy fill dropdown example - Remove me */
-  combo_history (wdata->combo);
+ // combo_history (wdata->combo);
 
-//  gtk_signal_connect (GTK_OBJECT (GTK_COMBO (wdata->combo)->entry),
-//                      "activate", GTK_SIGNAL_FUNC (chdir_edit),
+//  gtk_signal_connect (G_OBJECT (GTK_COMBO (wdata->combo)->entry),
+//                      "activate", G_SIGNAL_FUNC (chdir_edit),
 //                      (gpointer) wdata);
-  if (*wdata->history)
-     g_print("wdata->history %s", wdata->history);
+//  if (*wdata->history)
+ //    g_print("wdata->history %s", wdata->history);
 
  //   gtk_combo_set_popdown_strings (GTK_COMBO (wdata->combo), *wdata->history);
   //gtk_combo_disable_activate (GTK_COMBO (wdata->combo));
@@ -1034,7 +1042,7 @@ CreateFTPWindow (gftp_window_data * wdata)
   snprintf (tempstr, sizeof (tempstr), "%s_startup_directory",
               wdata->prefix_col_str);
 
-  gftp_lookup_global_option (tempstr, &startup_directory);
+  //gftp_lookup_global_option (tempstr, &startup_directory);
 
   /* Populate the combo box with our path? */
 //  gtk_entry_set_text (GTK_ENTRY (GTK_COMBO (wdata->combo)->entry),
@@ -1077,11 +1085,11 @@ CreateFTPWindow (gftp_window_data * wdata)
   add_columns (GTK_TREE_VIEW (treeview));
 
   /* finish & show */
-  //gtk_window_set_default_size (GTK_WINDOW (box), 280, 250);
+  gtk_window_set_default_size (GTK_WINDOW (box), 280, 250);
   //g_signal_connect (box, "delete-event",
   //                  G_CALLBACK (window_closed), NULL);
 
-#if 0
+
 
   // move these back up if useful
   const GtkTargetEntry possible_types[] = {
@@ -1089,9 +1097,9 @@ CreateFTPWindow (gftp_window_data * wdata)
     {"text/plain", 0, 0},
     {"application/x-rootwin-drop", 0, 1}
   };
-  char *titles[7], tempstr[50], *startup_directory;
-  GtkWidget *scroll_list;
-  intptr_t listbox_file_height, colwidth;
+//  char *titles[7], tempstr[50], *startup_directory;
+//  GtkWidget *scroll_list;
+//  intptr_t listbox_file_height, colwidth;
 
   titles[0] = "";
   titles[1] = _("Filename");
@@ -1106,35 +1114,35 @@ CreateFTPWindow (gftp_window_data * wdata)
 
   parent = gtk_frame_new (NULL);
  
-  gftp_lookup_global_option ("listbox_file_height", &listbox_file_height);
-  g_snprintf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
-  gftp_lookup_global_option (tempstr, &colwidth);
-  gtk_widget_set_size_request (parent, colwidth, listbox_file_height);
+//  gftp_lookup_global_option ("listbox_file_height", &listbox_file_height);
+//  g_snprintf (tempstr, sizeof (tempstr), "listbox_%s_width", wdata->prefix_col_str);
+//  gftp_lookup_global_option (tempstr, &colwidth);
+//  gtk_widget_set_size_request (parent, colwidth, listbox_file_height);
 
-  gtk_container_border_width (GTK_CONTAINER (parent), 5);
+  //gtk_container_border_width (GTK_CONTAINER (parent), 5);
 
   box = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (box), 5);
+ // gtk_container_border_width (GTK_CONTAINER (box), 5);
   gtk_container_add (GTK_CONTAINER (parent), box);
 
-  wdata->combo = gtk_combo_new ();
-  gtk_combo_set_case_sensitive (GTK_COMBO (wdata->combo), 1);
-  gtk_box_pack_start (GTK_BOX (box), wdata->combo, FALSE, FALSE, 0);
-  gtk_signal_connect (GTK_OBJECT (GTK_COMBO (wdata->combo)->entry),
-		      "activate", GTK_SIGNAL_FUNC (chdir_edit),
-		      (gpointer) wdata);
-  if (*wdata->history)
-    gtk_combo_set_popdown_strings (GTK_COMBO (wdata->combo), *wdata->history);
-  gtk_combo_disable_activate (GTK_COMBO (wdata->combo));
+ // wdata->combo = gtk_combo_new ();
+ // gtk_combo_set_case_sensitive (GTK_COMBO (wdata->combo), 1);
+ // gtk_box_pack_start (GTK_BOX (box), wdata->combo, FALSE, FALSE, 0);
+//  gtk_signal_connect (G_OBJECT (GTK_COMBO (wdata->combo)->entry),
+//		      "activate", G_SIGNAL_FUNC (chdir_edit),
+//		      (gpointer) wdata);
+//  if (*wdata->history)
+ //   gtk_combo_set_popdown_strings (GTK_COMBO (wdata->combo), *wdata->history);
+ // gtk_combo_disable_activate (GTK_COMBO (wdata->combo));
 
 //  g_printf (tempstr, sizeof (tempstr), "%s_startup_directory",
 //              wdata->prefix_col_str);
 //  g_snprintf (tempstr, sizeof (tempstr), "%s_startup_directory",
 //              wdata->prefix_col_str);
 
-  gftp_lookup_global_option (tempstr, &startup_directory);
-  gtk_entry_set_text (GTK_ENTRY (GTK_COMBO (wdata->combo)->entry),
-                      startup_directory);
+//  gftp_lookup_global_option (tempstr, &startup_directory);
+//  gtk_entry_set_text (GTK_ENTRY (GTK_COMBO (wdata->combo)->entry),
+  //                    startup_directory);
 
   wdata->hoststxt = gtk_label_new (NULL);
   gtk_misc_set_alignment (GTK_MISC (wdata->hoststxt), 0, 0);
@@ -1144,7 +1152,7 @@ CreateFTPWindow (gftp_window_data * wdata)
 //  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll_list),
 //				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-
+#if 0
   wdata->listbox = gtk_clist_new_with_titles (7, titles);
   gtk_container_add (GTK_CONTAINER (scroll_list), wdata->listbox);
   gtk_drag_source_set (wdata->listbox, GDK_BUTTON1_MASK, possible_types, 3,
@@ -1165,7 +1173,7 @@ CreateFTPWindow (gftp_window_data * wdata)
 
   gtk_clist_set_column_justification (GTK_CLIST (wdata->listbox), 2,
 				      GTK_JUSTIFY_RIGHT);
-
+    
   g_snprintf (tempstr, sizeof (tempstr), "%s_size_width", wdata->prefix_col_str);
   gftp_lookup_global_option (tempstr, &colwidth);
   setup_column (wdata->listbox, 2, colwidth);
@@ -1187,20 +1195,20 @@ CreateFTPWindow (gftp_window_data * wdata)
   setup_column (wdata->listbox, 6, colwidth);
 
   gtk_box_pack_start (GTK_BOX (box), scroll_list, TRUE, TRUE, 0);
-  gtk_signal_connect (GTK_OBJECT (wdata->listbox), "click_column",
-	 	      GTK_SIGNAL_FUNC (sortrows), (gpointer) wdata);
-  gtk_signal_connect (GTK_OBJECT (wdata->listbox), "drag_data_get",
-		      GTK_SIGNAL_FUNC (listbox_drag), (gpointer) wdata);
-  gtk_signal_connect (GTK_OBJECT (wdata->listbox), "drag_data_received",
-		      GTK_SIGNAL_FUNC (listbox_get_drag_data),
+  g_signal_connect (G_OBJECT (wdata->listbox), "click_column",
+	 	      G_SIGNAL_FUNC (sortrows), (gpointer) wdata);
+  g_signal_connect (G_OBJECT (wdata->listbox), "drag_data_get",
+		      G_SIGNAL_FUNC (listbox_drag), (gpointer) wdata);
+  g_signal_connect (G_OBJECT (wdata->listbox), "drag_data_received",
+		      G_SIGNAL_FUNC (listbox_get_drag_data),
 		      (gpointer) wdata);
-  gtk_signal_connect_after (GTK_OBJECT (wdata->listbox), "key_press_event",
-                            GTK_SIGNAL_FUNC (list_enter), (gpointer) wdata);
-  gtk_signal_connect (GTK_OBJECT (wdata->listbox), "select_row",
-                      GTK_SIGNAL_FUNC(select_row_callback),
+  g_signal_connect_after (G_OBJECT (wdata->listbox), "key_press_event",
+                            G_SIGNAL_FUNC (list_enter), (gpointer) wdata);
+  g_signal_connect (G_OBJECT (wdata->listbox), "select_row",
+                      G_SIGNAL_FUNC(select_row_callback),
                       (gpointer) wdata);
-  gtk_signal_connect_after (GTK_OBJECT (wdata->listbox), "button_press_event",
-                            GTK_SIGNAL_FUNC (list_dblclick), (gpointer) wdata);
+  g_signal_connect_after (G_OBJECT (wdata->listbox), "button_press_event",
+                            G_SIGNAL_FUNC (list_dblclick), (gpointer) wdata);
 #endif
   return (parent);
 }
@@ -1209,17 +1217,20 @@ CreateFTPWindow (gftp_window_data * wdata)
 static gint
 menu_mouse_click (GtkWidget * widget, GdkEventButton * event, gpointer data)
 {
-  GtkItemFactory *mfactory;
+//  GtkItemFactory *mfactory;
 
-  mfactory = (GtkItemFactory *) data;
-  if (event->button == 3)
-    gtk_item_factory_popup (mfactory, (guint) event->x_root,
-			    (guint) event->y_root, 3, event->time);
+ // mfactory = (GtkItemFactory *) data;
+ // if (event->button == 3)
+  //  gtk_item_factory_popup (mfactory, (guint) event->x_root,//
+//			    (guint) event->y_root, 3, event->time);
   return (FALSE);
 }
 
 GtkWidget *
 do_button_box ();
+
+GtkWidget *
+do_providers_tree ();
 
 
 static GtkWidget *
@@ -1237,35 +1248,37 @@ CreateFTPWindows (GtkWidget * ui)
   memset (&window1, 0, sizeof (window1));
   memset (&window2, 0, sizeof (window2));
 
-  gftp_lookup_global_option ("localhistory", &tmplistvar);
-  window1.history = &tmplistvar->list;
-  window1.histlen = &tmplistvar->num_items;
+  //gftp_lookup_global_option ("localhistory", &tmplistvar);
+//  window1.history = &tmplistvar->list;
+//  window1.histlen = &tmplistvar->num_items;
 
-  gftp_lookup_global_option ("remotehistory", &tmplistvar);
-  window2.history = &tmplistvar->list;
-  window2.histlen = &tmplistvar->num_items;
+  //gftp_lookup_global_option ("remotehistory", &tmplistvar);
+//  window2.history = &tmplistvar->list;
+ // window2.histlen = &tmplistvar->num_items;
  
   mainvbox = gtk_vbox_new (FALSE, 0);
 
-  tempwid = CreateMenus (ui);
-  gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
+ // tempwid = CreateMenus (ui);
+ // gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
 
-  tempwid = CreateConnectToolbar (ui);
-  gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
+  //tempwid = CreateConnectToolbar (ui);
+  //gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
 
-  tempwid = CreateCommandToolbar ();
-  gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
+  //tempwid = CreateCommandToolbar ();
+  //gtk_box_pack_start (GTK_BOX (mainvbox), tempwid, FALSE, FALSE, 0);
 
   winpane = gtk_hpaned_new ();
 
   box = gtk_hbox_new (FALSE, 0);
 
   window1.prefix_col_str = "local";
-  local_frame = CreateFTPWindow (&window1);
+
+  local_frame = do_providers_tree ();
+
   gtk_box_pack_start (GTK_BOX (box), local_frame, TRUE, TRUE, 0);
 
   dlbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (dlbox), 5);
+  //gtk_container_border_width (GTK_CONTAINER (dlbox), 5);
   gtk_box_pack_start (GTK_BOX (box), dlbox, FALSE, FALSE, 0);
 
   tempwid = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD,
@@ -1273,8 +1286,8 @@ CreateFTPWindows (GtkWidget * ui)
 
   upload_right_arrow = gtk_button_new ();
   gtk_box_pack_start (GTK_BOX (dlbox), upload_right_arrow, TRUE, FALSE, 0);
-  gtk_signal_connect_object (GTK_OBJECT (upload_right_arrow), "clicked",
-			     GTK_SIGNAL_FUNC (put_files), NULL);
+//  g_signal_connect_object (G_OBJECT (upload_right_arrow), "clicked",
+//			     G_SIGNAL_FUNC (put_files), NULL);
   gtk_container_add (GTK_CONTAINER (upload_right_arrow), tempwid);
 
   tempwid = gtk_image_new_from_stock (GTK_STOCK_GO_BACK,
@@ -1282,8 +1295,8 @@ CreateFTPWindows (GtkWidget * ui)
 
   download_left_arrow = gtk_button_new ();
   gtk_box_pack_start (GTK_BOX (dlbox), download_left_arrow, TRUE, FALSE, 0);
-  gtk_signal_connect_object (GTK_OBJECT (download_left_arrow), "clicked",
-			     GTK_SIGNAL_FUNC (get_files), NULL);
+//  gtk_signal_connect_object (G_OBJECT (download_left_arrow), "clicked",
+///			     G_SIGNAL_FUNC (get_files), NULL);
   gtk_container_add (GTK_CONTAINER (download_left_arrow), tempwid);
 
   gtk_paned_pack1 (GTK_PANED (winpane), box, 1, 1);
@@ -1298,33 +1311,33 @@ CreateFTPWindows (GtkWidget * ui)
   gtk_paned_pack1 (GTK_PANED (dlpane), winpane, 1, 1);
 
   transfer_scroll = gtk_scrolled_window_new (NULL, NULL);
-  gftp_lookup_global_option ("transfer_height", &tmplookup);
+  //gftp_lookup_global_option ("transfer_height", &tmplookup);
   gtk_widget_set_size_request (transfer_scroll, -1, tmplookup);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (transfer_scroll),
 				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   dltitles[0] = _("Filename");
   dltitles[1] = _("Progress");
-  dlwdw = gtk_ctree_new_with_titles (2, 0, dltitles);
-  gtk_clist_set_selection_mode (GTK_CLIST (dlwdw), GTK_SELECTION_SINGLE);
-  gtk_clist_set_reorderable (GTK_CLIST (dlwdw), 0);
+ // dlwdw = gtk_ctree_new_with_titles (2, 0, dltitles);
+ // gtk_clist_set_selection_mode (GTK_CLIST (dlwdw), GTK_SELECTION_SINGLE);
+ // gtk_clist_set_reorderable (GTK_CLIST (dlwdw), 0);
 
-  gftp_lookup_global_option ("file_trans_column", &tmplookup);
-  if (tmplookup == 0)
-    gtk_clist_set_column_auto_resize (GTK_CLIST (dlwdw), 0, TRUE);
-  else
-    gtk_clist_set_column_width (GTK_CLIST (dlwdw), 0, tmplookup);
+  //gftp_lookup_global_option ("file_trans_column", &tmplookup);
+  //if (tmplookup == 0)
+  //  gtk_clist_set_column_auto_resize (GTK_CLIST (dlwdw), 0, TRUE);
+  //else
+  //  gtk_clist_set_column_width (GTK_CLIST (dlwdw), 0, tmplookup);
 
   gtk_container_add (GTK_CONTAINER (transfer_scroll), dlwdw);
-  gtk_signal_connect (GTK_OBJECT (dlwdw), "button_press_event",
-		      GTK_SIGNAL_FUNC (menu_mouse_click), (gpointer) dl_factory);
+//  gtk_signal_connect (G_OBJECT (dlwdw), "button_press_event",
+//		      G_SIGNAL_FUNC (menu_mouse_click), (gpointer) dl_factory);
   gtk_paned_pack2 (GTK_PANED (dlpane), transfer_scroll, 1, 1);
 
   logpane = gtk_vpaned_new ();
   gtk_paned_pack1 (GTK_PANED (logpane), dlpane, 1, 1);
 
   log_table = gtk_table_new (1, 2, FALSE);
-  gftp_lookup_global_option ("log_height", &tmplookup);
+  //gftp_lookup_global_option ("log_height", &tmplookup);
   gtk_widget_set_size_request (log_table, -1, tmplookup);
 
   logwdw = gtk_text_view_new ();
@@ -1335,19 +1348,19 @@ CreateFTPWindows (GtkWidget * ui)
   textbuf = gtk_text_view_get_buffer (GTK_TEXT_VIEW (logwdw));
 
   tag = gtk_text_buffer_create_tag (textbuf, "send", NULL);
-  gftp_lookup_global_option ("send_color", &fore);
+  //gftp_lookup_global_option ("send_color", &fore);
   g_object_set (G_OBJECT (tag), "foreground_gdk", fore, NULL);
 
   tag = gtk_text_buffer_create_tag (textbuf, "recv", NULL);
-  gftp_lookup_global_option ("recv_color", &fore);
+  //gftp_lookup_global_option ("recv_color", &fore);
   g_object_set (G_OBJECT (tag), "foreground_gdk", fore, NULL);
 
   tag = gtk_text_buffer_create_tag (textbuf, "error", NULL);
-  gftp_lookup_global_option ("error_color", &fore);
+  //gftp_lookup_global_option ("error_color", &fore);
   g_object_set (G_OBJECT (tag), "foreground_gdk", fore, NULL);
 
   tag = gtk_text_buffer_create_tag (textbuf, "misc", NULL);
-  gftp_lookup_global_option ("misc_color", &fore);
+  //gftp_lookup_global_option ("misc_color", &fore);
   g_object_set (G_OBJECT (tag), "foreground_gdk", &fore, NULL);
 
   tempwid = gtk_scrolled_window_new (NULL, NULL);
@@ -1377,10 +1390,10 @@ CreateFTPWindows (GtkWidget * ui)
 static int
 _get_selected_protocol ()
 {
-  GtkWidget * tempwid;
+ // GtkWidget * tempwid;
   
-  tempwid = gtk_menu_get_active (GTK_MENU (protocol_menu));
-  return (GPOINTER_TO_INT (gtk_object_get_user_data (GTK_OBJECT (tempwid))));
+ // tempwid = gtk_menu_get_active (GTK_MENU (protocol_menu));
+ // return (GPOINTER_TO_INT (g_object_get_user_data (G_OBJECT (tempwid))));
 }
 
 
@@ -1408,71 +1421,72 @@ toolbar_hostedit (GtkWidget * widget, gpointer data)
   if (init (current_wdata->request) < 0)
     return;
  
-  txt = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (hostedit)->entry));
-  if (strchr (txt, '/') != NULL) 
-    {
-      /* The user entered a URL in the host box... */
-      gftpui_common_cmd_open (current_wdata, current_wdata->request, NULL, NULL, txt);
-      return;
-    }
+//  txt = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (hostedit)->entry));
+ // if (strchr (txt, '/') != NULL)
+   // {
+   //   /* The user entered a URL in the host box... */
+   //   gftpui_common_cmd_open (current_wdata, current_wdata->request, NULL, NULL, txt);
+   //   return;
+   // }
 
-  gftp_set_hostname (current_wdata->request, txt);
-  if (current_wdata->request->hostname == NULL)
-    return;
-  alltrim (current_wdata->request->hostname);
+  //gftp_set_hostname (current_wdata->request, txt);
+  //if (current_wdata->request->hostname == NULL)
+  //  return;
+  //alltrim (current_wdata->request->hostname);
 
-  if (current_wdata->request->need_hostport && 
-      *current_wdata->request->hostname == '\0')
-    {
-      ftp_log (gftp_logging_error, NULL,
-	       _("Error: You must type in a host to connect to\n"));
-      return;
-    }
+ // if (current_wdata->request->need_hostport &&
+  //    *current_wdata->request->hostname == '\0')
+  //  {
+  //    ftp_log (gftp_logging_error, NULL,
+//	       _("Error: You must type in a host to connect to\n"));
+ //     return;
+  //  }
 
-  gftp_lookup_global_option ("hosthistory", &tmplistvar);
-  add_history (hostedit, &tmplistvar->list, &tmplistvar->num_items, 
-               current_wdata->request->hostname);
+//  gftp_lookup_global_option ("hosthistory", &tmplistvar);
+//  add_history (hostedit, &tmplistvar->list, &tmplistvar->num_items,
+//               current_wdata->request->hostname);
 
-  if (strchr (current_wdata->request->hostname, '/') != NULL &&
-      gftp_parse_url (current_wdata->request, 
-                      current_wdata->request->hostname) == 0)
-    {
-      ftp_connect (current_wdata, current_wdata->request);
-      return;
-    }
+  //if (strchr (current_wdata->request->hostname, '/') != NULL &&
+     // gftp_parse_url (current_wdata->request,
+     //                 current_wdata->request->hostname) == 0)
+   // {
+   //   ftp_connect (current_wdata, current_wdata->request);
+   //   return;
+  //  }
  
-  txt = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (portedit)->entry));
-  gftp_set_port (current_wdata->request, strtol (txt, NULL, 10));
+//  txt = gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (portedit)->entry));
+//  gftp_set_port (current_wdata->request, strtol (txt, NULL, 10));
 
-  gftp_lookup_global_option ("porthistory", &tmplistvar);
-  add_history (portedit, &tmplistvar->list, &tmplistvar->num_items, txt);
+//  gftp_lookup_global_option ("porthistory", &tmplistvar);
+//  add_history (portedit, &tmplistvar->list, &tmplistvar->num_items, txt);
 
-  gftp_set_username (current_wdata->request, gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (useredit)->entry)));
-  if (current_wdata->request->username != NULL)
-    alltrim (current_wdata->request->username);
+ // gftp_set_username (current_wdata->request, gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (useredit)->entry)));
+ // if (current_wdata->request->username != NULL)
+   // alltrim (current_wdata->request->username);
 
 
-  gftp_lookup_global_option ("userhistory", &tmplistvar);
-  add_history (useredit, &tmplistvar->list, &tmplistvar->num_items, 
-               current_wdata->request->username);
+ // gftp_lookup_global_option ("userhistory", &tmplistvar);
+ // add_history (useredit, &tmplistvar->list, &tmplistvar->num_items,
+   //            current_wdata->request->username);
 
   gftp_set_password (current_wdata->request,
 		     gtk_entry_get_text (GTK_ENTRY (passedit)));
 
-  gftp_set_directory (current_wdata->request, gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (current_wdata->combo)->entry)));
-  if (current_wdata->request->directory != NULL)
-    alltrim (current_wdata->request->directory);
+//  gftp_set_directory (current_wdata->request, gtk_entry_get_text (GTK_ENTRY (GTK_COMBO (current_wdata->combo)->entry)));
+  //if (current_wdata->request->directory != NULL)
+  //  alltrim (current_wdata->request->directory);
 
-  add_history (current_wdata->combo, current_wdata->history, 
-               current_wdata->histlen, current_wdata->request->directory);
+ // add_history (current_wdata->combo, current_wdata->history,
+   //            current_wdata->histlen, current_wdata->request->directory);
 
-  ftp_connect (current_wdata, current_wdata->request);
+//  ftp_connect (current_wdata, current_wdata->request);
 }
 
 
-void
-sortrows (GtkCList * clist, gint column, gpointer data)
-{
+//void
+//sortrows (GtkCList * clist, gint column, gpointer data)
+//{
+#if 0
   char sortcol_name[25], sortasds_name[25];
   intptr_t sortcol, sortasds;
   gftp_window_data * wdata;
@@ -1499,7 +1513,7 @@ sortrows (GtkCList * clist, gint column, gpointer data)
     }
   else
     swap_col = 0;
-
+#if 0
   if (swap_col || !wdata->sorted)
     {
       sort_wid = gtk_clist_get_column_widget (clist, 0);
@@ -1515,6 +1529,7 @@ sortrows (GtkCList * clist, gint column, gpointer data)
       gtk_clist_set_column_widget (clist, 0, sort_wid);
     }
   else
+#endif
     {
       sortcol = column;
       gftp_set_global_option (sortcol_name, GINT_TO_POINTER (sortcol));
@@ -1523,8 +1538,8 @@ sortrows (GtkCList * clist, gint column, gpointer data)
   if (!GFTP_IS_CONNECTED (wdata->request))
     return;
 
-  gtk_clist_freeze (clist);
-  gtk_clist_clear (clist);
+//  gtk_clist_freeze (clist);
+ // gtk_clist_clear (clist);
 
   wdata->files = gftp_sort_filelist (wdata->files, sortcol, sortasds);
 
@@ -1537,12 +1552,14 @@ sortrows (GtkCList * clist, gint column, gpointer data)
 
   wdata->sorted = 1;
   gtk_clist_thaw (clist);
-}
+#endif
+//}
 
 
 void
 stop_button (GtkWidget * widget, gpointer data)
 {
+#if 0
   pthread_t comptid;
 
   memset (&comptid, 0, sizeof (comptid));
@@ -1556,6 +1573,7 @@ stop_button (GtkWidget * widget, gpointer data)
       window2.request->cancel = 1;
       pthread_kill (window2.tid, SIGINT);
     }
+#endif
 }
 
 
@@ -1601,53 +1619,50 @@ gftp_gtk_config_file_write_color (gftp_config_vars * cv, char *buf,
 static void
 _setup_window1 ()
 {
-  if (gftp_protocols[GFTP_LOCAL_NUM].init (window1.request) == 0)
-    {
-      gftp_setup_startup_directory (window1.request,
-                                    "local_startup_directory");
+//  if (gftp_protocols[GFTP_LOCAL_NUM].init (window1.request) == 0)
+  //  {
+    //  gftp_setup_startup_directory (window1.request,
+      //                              "local_startup_directory");
 
       g_print("gftp_setup_startup_directory should be set to local_startup_directory for window 1\n");
-
+#if 0
       gftp_connect (window1.request);
       g_print("gftp connect window 1\n");
 
       ftp_list_files (&window1);
       g_print("list files for window 1\n");
-    }
+#endif
+    //}
 }
 
 
 static void
 _setup_window2 (int argc, char **argv)
 {
-  intptr_t connect_to_remote_on_startup;
+ // intptr_t connect_to_remote_on_startup;
 
-  gftp_lookup_request_option (window2.request, "connect_to_remote_on_startup",
-                              &connect_to_remote_on_startup);
+  //gftp_lookup_request_option (window2.request, "connect_to_remote_on_startup",
+    //                          &connect_to_remote_on_startup);
 
   if (argc == 2 && strncmp (argv[1], "--", 2) != 0)
     {
-      if (gftp_parse_url (window2.request, argv[1]) == 0)
-        ftp_connect (&window2, window2.request);
-      else
+      //if (gftp_parse_url (window2.request, argv[1]) == 0)
+        //ftp_connect (&window2, window2.request);
+      //else
         gftp_usage ();
     }
-  else if (connect_to_remote_on_startup)
-    {
+#if 0
       if (gftp_protocols[_get_selected_protocol ()].init (current_wdata->request) == 0)
         {
           gftp_setup_startup_directory (window2.request,
                                         "remote_startup_directory");
           gftp_connect (window2.request);
-          ftp_list_files (&window2);
+          //ftp_list_files (&window2);
         }
-    }
-  else
-    {
+#endif
       /* On the remote window, even though we aren't connected, draw the sort
          icon on that side */
-      sortrows (GTK_CLIST (window2.listbox), -1, &window2);
-    }
+     // sortrows (GTK_CLIST (window2.listbox), -1, &window2);
 }
 
 
@@ -1659,36 +1674,37 @@ main (int argc, char **argv)
   /* We override the read color functions because we are using a GdkColor 
      structures to store the color. If I put this in lib/config_file.c, then 
      the core library would be dependant on Gtk+ being present */
-  gftp_option_types[gftp_option_type_color].read_function = gftp_gtk_config_file_read_color;
-  gftp_option_types[gftp_option_type_color].write_function = gftp_gtk_config_file_write_color;
+//  gftp_option_types[gftp_option_type_color].read_function = gftp_gtk_config_file_read_color;
+//  gftp_option_types[gftp_option_type_color].write_function = gftp_gtk_config_file_write_color;
 
-  gftpui_common_init (&argc, &argv, ftp_log);
-  gftpui_common_child_process_done = 0;
+  //gftpui_common_init (&argc, &argv, ftp_log);
+  //gftpui_common_child_process_done = 0;
 
-#if !GLIB_CHECK_VERSION(2,31,0)
-  g_thread_init (NULL);
-#endif
+//#if !GLIB_CHECK_VERSION(2,31,0)
+//  g_thread_init (NULL);
+//#endif
 
-  gdk_threads_init();
-  GDK_THREADS_ENTER ();
-  main_thread_id = pthread_self ();
-  gtk_set_locale ();
+//  gdk_threads_init();
+//  GDK_THREADS_ENTER ();
+//  main_thread_id = pthread_self ();
+//  gtk_set_locale ();
   gtk_init (&argc, &argv);
 
-  graphic_hash_table = g_hash_table_new (string_hash_function,
-                                         string_hash_compare);
+ // graphic_hash_table = g_hash_table_new (string_hash_function,
+ //                                        string_hash_compare);
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_signal_connect (GTK_OBJECT (window), "delete_event",
-		      GTK_SIGNAL_FUNC (_gftp_try_close), NULL);
-  gtk_signal_connect (GTK_OBJECT (window), "destroy",
-		      GTK_SIGNAL_FUNC (_gftp_force_close), NULL);
+//  g_signal_connect (G_OBJECT (window), "delete_event",
+//		      G_SIGNAL_FUNC (_gftp_try_close), NULL);
+//  g_signal_connect (G_OBJECT (window), "destroy",
+//		      G_SIGNAL_FUNC (_gftp_force_close), NULL);
   gtk_window_set_title (GTK_WINDOW (window), gftp_version);
   gtk_window_set_wmclass (GTK_WINDOW(window), "main", "gFTP");
   gtk_widget_set_name (window, gftp_version);
-  gtk_window_set_policy (GTK_WINDOW (window), TRUE, TRUE, FALSE);
+  //gtk_window_set_policy (GTK_WINDOW (window), TRUE, TRUE, FALSE);
   gtk_widget_realize (window);
 
+#if 0
   gftp_icon = open_xpm (window, "gftp.xpm");
   if (gftp_icon != NULL)
     {
@@ -1696,7 +1712,8 @@ main (int argc, char **argv)
                            gftp_icon->bitmap);
       gdk_window_set_icon_name (window->window, gftp_version);
     }
-
+#endif
+    
   other_wdata = &window1;
   current_wdata = &window2;
   ui = CreateFTPWindows (window);
@@ -1705,9 +1722,9 @@ main (int argc, char **argv)
 
   gtk_window_set_gravity (window, GDK_GRAVITY_CENTER);
   gtk_window_move (window, gdk_screen_width()/6, gdk_screen_height()/6) ;
-//  gtk_window_move (window, 0, 0) ;
+  gtk_window_move (window, 0, 0) ;
 
-  gftpui_common_about (ftp_log, NULL);
+  //gftpui_common_about (ftp_log, NULL);
 
  // gtk_timeout_add (1000, update_downloads, NULL);
 
@@ -1717,7 +1734,6 @@ main (int argc, char **argv)
   gftp_gtk_platform_specific_init();
 
   gtk_main ();
-  GDK_THREADS_LEAVE ();
 
   return (0);
 }
@@ -1726,12 +1742,15 @@ main (int argc, char **argv)
 void
 gftpui_show_or_hide_command (void)
 {
-  intptr_t cmd_in_gui;
+#if 0
+    intptr_t cmd_in_gui;
 
   gftp_lookup_global_option ("cmd_in_gui", &cmd_in_gui);
   if (cmd_in_gui)
     gtk_widget_show (gftpui_command_toolbar);
   else
     gtk_widget_hide (gftpui_command_toolbar);
+#endif
+ //   gtk_widget_show (gftpui_command_toolbar);
 }
 

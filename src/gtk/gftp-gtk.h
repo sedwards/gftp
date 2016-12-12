@@ -32,11 +32,11 @@
 #define GFTP_MENU_ITEM_BINARY	2
 #define GFTP_MENU_ITEM_WIN1	3
 #define GFTP_MENU_ITEM_WIN2	4
-
+#if 0
 #define IS_ONE_SELECTED(wdata)		(GTK_CLIST ((wdata)->listbox)->selection && GTK_CLIST ((wdata)->listbox)->selection->next == NULL)
 #define IS_NONE_SELECTED(wdata)		(GTK_CLIST ((wdata)->listbox)->selection == NULL)
 #define gftp_gtk_get_list_selection(wdata)  (GTK_CLIST ((wdata)->listbox)->selection)
-
+#endif
 #define GFTP_IS_SAME_HOST_START_TRANS(wdata,trequest) \
   ((wdata) != NULL && (wdata)->request != NULL && \
   (wdata)->request->datafd > 0 && !(wdata)->request->always_connected && \
@@ -90,10 +90,10 @@ typedef struct gftp_window_data_tag
                *histlen;	/* Pointer to length of history */
   char *filespec;		/* Filespec for the listbox */
   gftp_request * request;	/* The host that we are connected to */
-  GList * files,		/* Files in the listbox */
-        ** history;		/* History of the directories */
-  GtkItemFactory *ifactory; 	/* This is for the menus that will
-                                   come up when you right click */
+//  GList * files,		/* Files in the listbox */
+  //      ** history;		/* History of the directories */
+//  GtkItemFactory *ifactory; 	/* This is for the menus that will
+  //                                 come up when you right click */
   pthread_t tid;		/* Thread for the stop button */
   char *prefix_col_str;
 } gftp_window_data;
@@ -109,8 +109,8 @@ typedef struct _gftpui_gtk_thread_data
 typedef struct gftp_graphic_tag
 {
   char * filename;
-  GdkPixmap * pixmap;
-  GdkBitmap * bitmap;
+//  GdkPixmap * pixmap;
+//  GdkBitmap * bitmap;
 } gftp_graphic;
 
 
@@ -181,15 +181,15 @@ extern GtkWidget * stop_btn, * hostedit, * useredit, * passedit,
                  * portedit, * logwdw, * dlwdw, * optionmenu,
                  * gftpui_command_widget, * download_left_arrow,
                  * upload_right_arrow, * openurl_btn;
-extern GtkTooltips * openurl_tooltip;
+//extern GtkTooltips * openurl_tooltip;
 extern GtkAdjustment * logwdw_vadj;
 #if GTK_MAJOR_VERSION > 1
 extern GtkTextMark * logwdw_textmark;
 #endif
 extern int local_start, remote_start, trans_start;
 extern GHashTable * graphic_hash_table;
-extern GtkItemFactoryEntry * menus;
-extern GtkItemFactory * factory;
+//extern GtkItemFactoryEntry * menus;
+//extern GtkItemFactory * factory;
 extern pthread_mutex_t log_mutex;
 extern gftp_graphic * gftp_icon;
 extern pthread_t main_thread_id;
@@ -243,9 +243,9 @@ void gftp_gtk_init_request 			( gftp_window_data * wdata );
 void toolbar_hostedit 				( GtkWidget * widget, 
 						  gpointer data );
 
-void sortrows 					( GtkCList * clist, 
-						  gint column, 
-						  gpointer data );
+//void sortrows 					( GtkCList * clist,
+//						  gint column,
+//						  gpointer data );
 
 void stop_button				( GtkWidget * widget,
 						  gpointer data );
@@ -325,10 +325,10 @@ gftp_graphic * open_xpm				( GtkWidget * widget,
 
 void gftp_free_pixmap 				( char *filename ); 
 
-void gftp_get_pixmap 				( GtkWidget * widget, 
-						  char *filename, 
-						  GdkPixmap ** pix,
-						  GdkBitmap ** bitmap );
+//void gftp_get_pixmap 				( GtkWidget * widget, 
+//						  char *filename, 
+//						  GdkPixmap ** pix,
+//						  GdkBitmap ** bitmap );
 
 int check_status				( char *name,
 						  gftp_window_data * wdata,
@@ -337,15 +337,15 @@ int check_status				( char *name,
 						  unsigned int at_least_one,
 						  unsigned int func );
 
-GtkItemFactory *item_factory_new                ( GtkType	       container_type,
-						  const char	      *path,
-						  GtkAccelGroup       *accel_group,
-						  const char          *strip_prefix );
+//GtkItemFactory *item_factory_new                ( GtkType	       container_type,
+//						  const char	      *path,
+//						  GtkAccelGroup       *accel_group,
+//						  const char          *strip_prefix );
 
-void create_item_factory 			( GtkItemFactory * ifactory, 
-						  gint n_entries, 
-						  GtkItemFactoryEntry * entries,
-						  gpointer callback_data );
+//void create_item_factory 			( GtkItemFactory * ifactory, 
+//						  gint n_entries, 
+//						  GtkItemFactoryEntry * entries,
+//						  gpointer callback_data );
 
 void add_history 				( GtkWidget * widget, 
 						  GList ** history, 

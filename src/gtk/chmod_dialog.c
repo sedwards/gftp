@@ -58,7 +58,7 @@ static void
 dochmod (GtkWidget * widget, gftp_window_data * wdata)
 {
   gftpui_callback_data * cdata;
-
+#if 0
   mode = 0;
   if (GTK_TOGGLE_BUTTON (suid)->active)
     mode |= S_ISUID;
@@ -87,7 +87,7 @@ dochmod (GtkWidget * widget, gftp_window_data * wdata)
     mode |= S_IWOTH;
   if (GTK_TOGGLE_BUTTON (ox)->active)
     mode |= S_IXOTH;
-
+#endif
   if (check_reconnect (wdata) < 0)
     return;
 
@@ -119,7 +119,7 @@ chmod_action (GtkWidget * widget, gint response, gpointer wdata)
 void
 chmod_dialog (gpointer data)
 {
-  GtkWidget *tempwid, *dialog, *hbox, *vbox;
+  GtkWidget *tempwid, *dialog, *hbox, *box;
   GList * templist, * filelist;
   gftp_window_data * wdata;
   gftp_file * tempfle;
@@ -138,8 +138,8 @@ chmod_dialog (gpointer data)
 
   gtk_window_set_wmclass (GTK_WINDOW(dialog), "Chmod", "gFTP");
   gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_MOUSE);
-  gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 5);
-  gtk_container_border_width (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), 10);
+ // gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->box), 5);
+  gtk_container_border_width (GTK_CONTAINER (GTK_DIALOG (dialog)->box), 10);
   gtk_widget_realize (dialog);
 
   if (gftp_icon != NULL)
@@ -150,12 +150,12 @@ chmod_dialog (gpointer data)
     }
 
   tempwid = gtk_label_new (_("You can now adjust the attributes of your file(s)\nNote: Not all ftp servers support the chmod feature"));
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), tempwid, FALSE,
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->box), tempwid, FALSE,
 		      FALSE, 0);
   gtk_widget_show (tempwid);
 
   hbox = gtk_hbox_new (TRUE, 5);
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), hbox, FALSE, FALSE,
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->box), hbox, FALSE, FALSE,
 		      0);
   gtk_widget_show (hbox);
 
@@ -163,80 +163,80 @@ chmod_dialog (gpointer data)
   gtk_box_pack_start (GTK_BOX (hbox), tempwid, FALSE, FALSE, 0);
   gtk_widget_show (tempwid);
 
-  vbox = gtk_vbox_new (TRUE, 5);
-  gtk_container_add (GTK_CONTAINER (tempwid), vbox);
-  gtk_widget_show (vbox);
+  box = gtk_box_new (TRUE, 5);
+  gtk_container_add (GTK_CONTAINER (tempwid), box);
+  gtk_widget_show (box);
 
   suid = gtk_check_button_new_with_label (_("SUID"));
-  gtk_box_pack_start (GTK_BOX (vbox), suid, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), suid, FALSE, FALSE, 0);
   gtk_widget_show (suid);
 
   sgid = gtk_check_button_new_with_label (_("SGID"));
-  gtk_box_pack_start (GTK_BOX (vbox), sgid, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), sgid, FALSE, FALSE, 0);
   gtk_widget_show (sgid);
 
   sticky = gtk_check_button_new_with_label (_("Sticky"));
-  gtk_box_pack_start (GTK_BOX (vbox), sticky, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), sticky, FALSE, FALSE, 0);
   gtk_widget_show (sticky);
 
   tempwid = gtk_frame_new (_("User"));
   gtk_box_pack_start (GTK_BOX (hbox), tempwid, FALSE, FALSE, 0);
   gtk_widget_show (tempwid);
 
-  vbox = gtk_vbox_new (TRUE, 5);
-  gtk_container_add (GTK_CONTAINER (tempwid), vbox);
-  gtk_widget_show (vbox);
+  box = gtk_box_new (TRUE, 5);
+  gtk_container_add (GTK_CONTAINER (tempwid), box);
+  gtk_widget_show (box);
 
   ur = gtk_check_button_new_with_label (_("Read"));
-  gtk_box_pack_start (GTK_BOX (vbox), ur, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), ur, FALSE, FALSE, 0);
   gtk_widget_show (ur);
 
   uw = gtk_check_button_new_with_label (_("Write"));
-  gtk_box_pack_start (GTK_BOX (vbox), uw, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), uw, FALSE, FALSE, 0);
   gtk_widget_show (uw);
 
   ux = gtk_check_button_new_with_label (_("Execute"));
-  gtk_box_pack_start (GTK_BOX (vbox), ux, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), ux, FALSE, FALSE, 0);
   gtk_widget_show (ux);
 
   tempwid = gtk_frame_new (_("Group"));
   gtk_box_pack_start (GTK_BOX (hbox), tempwid, FALSE, FALSE, 0);
   gtk_widget_show (tempwid);
 
-  vbox = gtk_vbox_new (TRUE, 5);
-  gtk_container_add (GTK_CONTAINER (tempwid), vbox);
-  gtk_widget_show (vbox);
+  box = gtk_box_new (TRUE, 5);
+  gtk_container_add (GTK_CONTAINER (tempwid), box);
+  gtk_widget_show (box);
 
   gr = gtk_check_button_new_with_label (_("Read"));
-  gtk_box_pack_start (GTK_BOX (vbox), gr, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), gr, FALSE, FALSE, 0);
   gtk_widget_show (gr);
 
   gw = gtk_check_button_new_with_label (_("Write"));
-  gtk_box_pack_start (GTK_BOX (vbox), gw, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), gw, FALSE, FALSE, 0);
   gtk_widget_show (gw);
 
   gx = gtk_check_button_new_with_label (_("Execute"));
-  gtk_box_pack_start (GTK_BOX (vbox), gx, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), gx, FALSE, FALSE, 0);
   gtk_widget_show (gx);
 
   tempwid = gtk_frame_new (_("Other"));
   gtk_box_pack_start (GTK_BOX (hbox), tempwid, FALSE, FALSE, 0);
   gtk_widget_show (tempwid);
 
-  vbox = gtk_vbox_new (TRUE, 5);
-  gtk_container_add (GTK_CONTAINER (tempwid), vbox);
-  gtk_widget_show (vbox);
+  box = gtk_box_new (TRUE, 5);
+  gtk_container_add (GTK_CONTAINER (tempwid), box);
+  gtk_widget_show (box);
 
   or = gtk_check_button_new_with_label (_("Read"));
-  gtk_box_pack_start (GTK_BOX (vbox), or, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), or, FALSE, FALSE, 0);
   gtk_widget_show (or);
 
   ow = gtk_check_button_new_with_label (_("Write"));
-  gtk_box_pack_start (GTK_BOX (vbox), ow, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), ow, FALSE, FALSE, 0);
   gtk_widget_show (ow);
 
   ox = gtk_check_button_new_with_label (_("Execute"));
-  gtk_box_pack_start (GTK_BOX (vbox), ox, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (box), ox, FALSE, FALSE, 0);
   gtk_widget_show (ox);
 
   g_signal_connect (GTK_OBJECT (dialog), "response",

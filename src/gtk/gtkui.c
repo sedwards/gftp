@@ -35,8 +35,8 @@ gftpui_run_command (GtkWidget * widget, gpointer data)
   const char *txt;
 
   txt = gtk_entry_get_text (GTK_ENTRY (gftpui_command_widget));
-  gftpui_common_process_command (&window1, window1.request,
-                                 &window2, window2.request, txt);
+  //gftpui_common_process_command (&window1, window1.request,
+  //                               &window2, window2.request, txt);
   gtk_entry_set_text (GTK_ENTRY (gftpui_command_widget), "");
 }
 
@@ -63,14 +63,13 @@ gftpui_refresh (void *uidata, int clear_cache_entry)
       wdata->request->refreshing = 0;
       return;
     }
-
+#if 0
   gtk_clist_freeze (GTK_CLIST (wdata->listbox));
   remove_files_window (wdata);
 
   ftp_list_files (wdata);
   gtk_clist_thaw (GTK_CLIST (wdata->listbox));
 
-#if 0
   int i;
   for (i = 0; i < G_N_ELEMENTS (wdata->listbox); i++)
     { 
@@ -115,7 +114,7 @@ gftpui_show_busy (gboolean busy)
   GdkCursor * busyCursor = 
     (busy) ? (gdk_cursor_new_for_display (display, GDK_WATCH)) : NULL;
 
-  gdk_window_set_cursor (toplevel->window, busyCursor);
+//  gdk_window_set_cursor (toplevel->window, busyCursor);
 
   if (busy)
     gdk_cursor_unref (busyCursor);
@@ -133,7 +132,7 @@ gftpui_prompt_username (void *uidata, gftp_request * request)
   request->stopable = 1;
   while (request->stopable)
     {
-      GDK_THREADS_LEAVE ();
+      
       g_main_context_iteration (NULL, TRUE);
     }
 }
@@ -151,12 +150,12 @@ gftpui_prompt_password (void *uidata, gftp_request * request)
   request->stopable = 1;
   while (request->stopable)
     {
-      GDK_THREADS_LEAVE ();
+      
       g_main_context_iteration (NULL, TRUE);
     }
 }
 
-
+#if 0
 /* The wakeup main thread functions are so that after the thread terminates
    there won't be a delay in updating the GUI */
 static void
@@ -170,7 +169,7 @@ _gftpui_wakeup_main_thread (gpointer data, gint source,
   if (request->wakeup_main_thread[0] > 0)
     read (request->wakeup_main_thread[0], &c, 1);
 }
-
+#endif
 
 static gint
 _gftpui_setup_wakeup_main_thread (gftp_request * request)
@@ -179,9 +178,9 @@ _gftpui_setup_wakeup_main_thread (gftp_request * request)
 
   if (socketpair (AF_UNIX, SOCK_STREAM, 0, request->wakeup_main_thread) == 0)
     {
-      handler = gdk_input_add (request->wakeup_main_thread[0],
-                               GDK_INPUT_READ, _gftpui_wakeup_main_thread,
-                               request);
+//      handler = gdk_input_add (request->wakeup_main_thread[0],
+  //                             GDK_INPUT_READ, _gftpui_wakeup_main_thread,
+    //                           request);
     }
   else
     {
@@ -199,7 +198,7 @@ _gftpui_teardown_wakeup_main_thread (gftp_request * request, gint handler)
 {
   if (request->wakeup_main_thread[0] > 0 && request->wakeup_main_thread[1] > 0)
     {
-      gdk_input_remove (handler);
+      //gdk_input_remove (handler);
       close (request->wakeup_main_thread[0]);
       close (request->wakeup_main_thread[1]);
       request->wakeup_main_thread[0] = 0;
@@ -247,7 +246,7 @@ gftpui_generic_thread (void * (*func) (void *), void *data)
 
   while (wdata->request->stopable)
     {
-      GDK_THREADS_LEAVE ();
+      
       g_main_context_iteration (NULL, TRUE);
     }
 
@@ -267,12 +266,14 @@ gftpui_generic_thread (void * (*func) (void *), void *data)
 int
 gftpui_check_reconnect (gftpui_callback_data * cdata)
 {
-  gftp_window_data * wdata;
+#if 0
+      	gftp_window_data * wdata;
 
   wdata = cdata->uidata;
   return (wdata->request->cached && wdata->request->datafd < 0 &&
           !wdata->request->always_connected &&
           !ftp_connect (wdata, wdata->request) ? -1 : 0);
+#endif
 }
 
 
@@ -297,15 +298,15 @@ gftpui_run_function_callback (gftp_window_data * wdata,
       cdata->input_string = g_strdup (edttext);
     }
 
-  if (ddata->checkbox != NULL)
-    cdata->toggled = GTK_TOGGLE_BUTTON (ddata->checkbox)->active;
-  else
+ // if (ddata->checkbox != NULL)
+//    cdata->toggled = GTK_TOGGLE_BUTTON (ddata->checkbox)->active;
+ // else
     cdata->toggled = 0;
 
   gtk_widget_destroy (ddata->dialog);
   ddata->dialog = NULL;
 
-  gftpui_common_run_callback_function (cdata);
+  //gftpui_common_run_callback_function (cdata);
 }
 
 
@@ -334,7 +335,7 @@ gftpui_mkdir_dialog (gpointer data)
   cdata = g_malloc0 (sizeof (*cdata));
   cdata->request = wdata->request;
   cdata->uidata = wdata;
-  cdata->run_function = gftpui_common_run_mkdir;
+//  cdata->run_function = gftpui_common_run_mkdir;
 
   if (!check_status (_("Mkdir"), wdata, gftpui_common_use_threads (wdata->request), 0, 0, wdata->request->mkdir != NULL))
     return;
@@ -349,7 +350,8 @@ gftpui_mkdir_dialog (gpointer data)
 void
 gftpui_rename_dialog (gpointer data)
 {
-  gftpui_callback_data * cdata;
+#if 0
+    gftpui_callback_data * cdata;
   GList *templist, *filelist;
   gftp_window_data * wdata;
   gftp_file * curfle;
@@ -379,13 +381,15 @@ gftpui_rename_dialog (gpointer data)
                   gftpui_run_function_callback, cdata,
                   gftpui_run_function_cancel_callback, cdata);
   g_free (tempstr);
+#endif
 }
 
 
 void
 gftpui_site_dialog (gpointer data)
 {
-  gftpui_callback_data * cdata;
+#if 0
+      	gftpui_callback_data * cdata;
   gftp_window_data * wdata;
 
   wdata = data;
@@ -401,6 +405,7 @@ gftpui_site_dialog (gpointer data)
                   _("Prepend with SITE"), gftp_dialog_button_ok,
                   gftpui_run_function_callback, cdata,
                   gftpui_run_function_cancel_callback, cdata);
+#endif
 }
 
 
@@ -419,11 +424,11 @@ gftpui_run_chdir (gpointer uidata, char *directory)
   cdata = g_malloc0 (sizeof (*cdata));
   cdata->request = wdata->request;
   cdata->uidata = wdata;
-  cdata->run_function = gftpui_common_run_chdir;
+//  cdata->run_function = gftpui_common_run_chdir;
   cdata->input_string = tempstr;
   cdata->dont_clear_cache = 1;
 
-  ret = gftpui_common_run_callback_function (cdata);
+//  ret = gftpui_common_run_callback_function (cdata);
 
   g_free(tempstr);
   g_free (cdata);
@@ -434,7 +439,8 @@ gftpui_run_chdir (gpointer uidata, char *directory)
 void
 gftpui_chdir_dialog (gpointer data)
 {
-  GList *templist, *filelist;
+#if 0
+    GList *templist, *filelist;
   gftp_window_data * wdata;
   gftp_file * curfle;
   char *tempstr;
@@ -455,6 +461,7 @@ gftpui_chdir_dialog (gpointer data)
                              curfle->file, NULL);
   gftpui_run_chdir (wdata, tempstr);
   g_free (tempstr);
+#endif
 }
 
 
@@ -510,7 +517,7 @@ gftpui_protocol_ask_yes_no (gftp_request * request, char *title,
 {
   int answer = -1;
 
-  GDK_THREADS_ENTER ();
+
 
   MakeYesNoDialog (title, question, _protocol_yes_answer, &answer,
                    _protocol_no_answer, &answer);
@@ -518,7 +525,7 @@ gftpui_protocol_ask_yes_no (gftp_request * request, char *title,
   if (gftp_protocols[request->protonum].use_threads)
     {
       /* Let the main loop in the main thread run the events */
-      GDK_THREADS_LEAVE ();
+      
 
       while (answer == -1)
         {
@@ -529,7 +536,7 @@ gftpui_protocol_ask_yes_no (gftp_request * request, char *title,
     {
       while (answer == -1)
         {
-          GDK_THREADS_LEAVE ();
+          
           g_main_context_iteration (NULL, TRUE);
         }
     }
@@ -560,7 +567,7 @@ gftpui_protocol_ask_user_input (gftp_request * request, char *title,
 {
   char buf[BUFSIZ];
 
-  GDK_THREADS_ENTER ();
+
 
   *buf = '\0';
   *(buf + 1) = ' ';
@@ -570,7 +577,7 @@ gftpui_protocol_ask_user_input (gftp_request * request, char *title,
   if (gftp_protocols[request->protonum].use_threads)
     {
       /* Let the main loop in the main thread run the events */
-      GDK_THREADS_LEAVE ();
+      
 
       while (*buf == '\0' && *(buf + 1) == ' ')
         {
@@ -581,7 +588,7 @@ gftpui_protocol_ask_user_input (gftp_request * request, char *title,
     {
       while (*buf == '\0' && *(buf + 1) == ' ')
         {
-          GDK_THREADS_LEAVE ();
+          
           g_main_context_iteration (NULL, TRUE);
         }
     }

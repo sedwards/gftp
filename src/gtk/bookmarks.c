@@ -17,6 +17,7 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111 USA      */
 /*****************************************************************************/
 
+#if 0
 #include "gftp-gtk.h"
 
 static GtkWidget * bm_dialog = NULL, * edit_bookmarks_dialog = NULL;
@@ -26,7 +27,6 @@ static GtkWidget * bm_hostedit, * bm_portedit, * bm_localdiredit,
 static GHashTable * new_bookmarks_htable = NULL;
 static gftp_bookmarks_var * new_bookmarks = NULL;
 static GtkItemFactory * edit_factory;
-
 
 void
 run_bookmark (gpointer data)
@@ -1236,4 +1236,6 @@ edit_bookmarks (gpointer data)
 
   build_bookmarks_tree ();
 }
+
+#endif
 

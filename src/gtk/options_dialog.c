@@ -49,6 +49,7 @@ _setup_option (gftp_option_type_enum otype,
 static void *
 _gen_input_widget (gftp_options_dialog_data * option_data, char *label, char *tiptxt)
 {
+#if 0
   GtkTooltips * tooltip;
   GtkWidget * tempwid;
 
@@ -78,6 +79,7 @@ _gen_input_widget (gftp_options_dialog_data * option_data, char *label, char *ti
     }
 
   return (tempwid);
+#endif
 }
 
 
@@ -162,6 +164,7 @@ _gen_combo_widget (gftp_options_dialog_data * option_data, char *label)
 static void *
 _print_option_type_textcombo (gftp_config_vars * cv, void *user_data, void *value)
 {
+#if 0
   gftp_options_dialog_data * option_data;
   GtkWidget * tempwid, * combo;
   GList * widget_list;
@@ -201,13 +204,15 @@ _print_option_type_textcombo (gftp_config_vars * cv, void *user_data, void *valu
     }
 
   return (combo);
+#endif
 }
 
 
 static void
 _save_option_type_textcombo (gftp_config_vars * cv, void *user_data)
 {
-  gftp_options_dialog_data * option_data;
+#if 0
+    gftp_options_dialog_data * option_data;
   const char *tempstr;
 
   option_data = user_data;
@@ -218,12 +223,14 @@ _save_option_type_textcombo (gftp_config_vars * cv, void *user_data)
     gftp_set_global_option (cv->key, tempstr);
   else
     gftp_set_bookmark_option (option_data->bm, cv->key, tempstr);
+#endif
 }
 
-
+#if 0
 static void
 _textcomboedt_toggle (GtkList * list, GtkWidget * child, gpointer data)
 {
+
   gftp_textcomboedt_widget_data * widdata;
   gftp_textcomboedt_data * tedata;
   char *insert_text;
@@ -254,7 +261,7 @@ _textcomboedt_toggle (GtkList * list, GtkWidget * child, gpointer data)
   gtk_text_buffer_get_iter_at_offset (textbuf, &iter, len);
   gtk_text_buffer_insert (textbuf, &iter, insert_text, -1);
 }
-
+#endif
 
 static char *
 _gftp_convert_to_newlines (char *str)
@@ -329,6 +336,7 @@ _gftp_convert_from_newlines (char *str)
 static void *
 _print_option_type_textcomboedt (gftp_config_vars * cv, void *user_data, void *value)
 {
+#if 0
   gftp_textcomboedt_widget_data * widdata;
   GtkWidget * box, * combo, * textwid, * tempwid;
   gftp_options_dialog_data * option_data;
@@ -429,6 +437,7 @@ _print_option_type_textcomboedt (gftp_config_vars * cv, void *user_data, void *v
 
   g_print("Current Working directory is %s", tempstr);
   return (widdata);
+#endif
 }
 
 
@@ -520,7 +529,8 @@ _save_option_type_int (gftp_config_vars * cv, void *user_data)
 static void *
 _print_option_type_checkbox (gftp_config_vars * cv, void *user_data, void *value)
 {
-  gftp_options_dialog_data * option_data;
+#if 0
+    gftp_options_dialog_data * option_data;
   GtkTooltips * tooltip;
   GtkWidget * tempwid;
 
@@ -556,13 +566,15 @@ _print_option_type_checkbox (gftp_config_vars * cv, void *user_data, void *value
     }
 
   return (tempwid);
+#endif
 }
 
 
 static void
 _save_option_type_checkbox (gftp_config_vars * cv, void *user_data)
 {
-  gftp_options_dialog_data * option_data;
+#if 0
+    gftp_options_dialog_data * option_data;
   intptr_t val;
 
   option_data = user_data;
@@ -573,6 +585,7 @@ _save_option_type_checkbox (gftp_config_vars * cv, void *user_data)
     gftp_set_global_option (cv->key, GINT_TO_POINTER (val));
   else
     gftp_set_bookmark_option (option_data->bm, cv->key, GINT_TO_POINTER (val));
+#endif
 }
 
 
@@ -760,6 +773,7 @@ add_host_to_listbox (GList * templist)
 static void
 add_ok (GtkWidget * widget, gpointer data)
 {
+#if 0
   gftp_proxy_hosts *hosts;
   const char *edttxt;
   GList *templist;
@@ -821,6 +835,7 @@ add_ok (GtkWidget * widget, gpointer data)
     }
 
   add_host_to_listbox (templist);
+#endif
 }
 
 
@@ -865,7 +880,8 @@ buttons_toggle (GtkWidget * widget, gint row, gint col, GdkEventButton * event, 
 static void
 delete_proxy_host (GtkWidget * widget, gpointer data)
 {
-  GList *templist;
+#if 0
+    GList *templist;
   int num;
 
   gftp_configuration_changed = 1; /* FIXME */
@@ -877,12 +893,14 @@ delete_proxy_host (GtkWidget * widget, gpointer data)
   new_proxy_hosts = g_list_remove_link (new_proxy_hosts, templist);
   gtk_clist_remove (GTK_CLIST (proxy_list), num);
   buttons_toggle (NULL, 0, 0, 0, NULL);
+#endif
 }
 
 
 static void
 add_proxy_host (GtkWidget * widget, gpointer data)
 {
+#if 0
   GtkWidget *tempwid, *dialog, *box, *rbox, *vbox, *nradio, *table;
   gftp_proxy_hosts *hosts;
   char *tempstr, *title;
@@ -916,7 +934,7 @@ add_proxy_host (GtkWidget * widget, gpointer data)
   gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
-  gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 2);
+//  gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 2);
   gtk_window_set_wmclass (GTK_WINDOW(dialog), "hostinfo", "Gftp");
   gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_MOUSE);
 
@@ -1126,11 +1144,13 @@ add_proxy_host (GtkWidget * widget, gpointer data)
                     G_CALLBACK (proxyhosts_action), NULL);
 
   gtk_widget_show (dialog);
+#endif
 }
 
 static void
 make_proxy_hosts_tab (GtkWidget * notebook)
 {
+#if 0
   GtkWidget *tempwid, *box, *hbox, *scroll;
   gftp_config_list_vars * proxy_hosts;
   char *add_data[2];
@@ -1174,7 +1194,7 @@ make_proxy_hosts_tab (GtkWidget * notebook)
 
   tempwid = gtk_button_new_from_stock (GTK_STOCK_ADD);
 
-  GTK_WIDGET_SET_FLAGS (tempwid, GTK_CAN_DEFAULT);
+//  GTK_WIDGET_SET_FLAGS (tempwid, GTK_CAN_DEFAULT);
   gtk_box_pack_start (GTK_BOX (hbox), tempwid, TRUE, TRUE, 0);
   gtk_signal_connect (GTK_OBJECT (tempwid), "clicked",
 		      GTK_SIGNAL_FUNC (add_proxy_host), NULL);
@@ -1186,7 +1206,7 @@ make_proxy_hosts_tab (GtkWidget * notebook)
   tempwid = gtk_button_new_from_stock (GTK_STOCK_EDIT);
 #endif
   edit_button = tempwid;
-  GTK_WIDGET_SET_FLAGS (tempwid, GTK_CAN_DEFAULT);
+//  GTK_WIDGET_SET_FLAGS (tempwid, GTK_CAN_DEFAULT);
   gtk_box_pack_start (GTK_BOX (hbox), tempwid, TRUE, TRUE, 0);
   gtk_signal_connect (GTK_OBJECT (tempwid), "clicked",
 		      GTK_SIGNAL_FUNC (add_proxy_host), (gpointer) 1);
@@ -1195,7 +1215,7 @@ make_proxy_hosts_tab (GtkWidget * notebook)
   tempwid = gtk_button_new_from_stock (GTK_STOCK_DELETE);
 
   delete_button = tempwid;
-  GTK_WIDGET_SET_FLAGS (tempwid, GTK_CAN_DEFAULT);
+//  GTK_WIDGET_SET_FLAGS (tempwid, GTK_CAN_DEFAULT);
   gtk_box_pack_start (GTK_BOX (hbox), tempwid, TRUE, TRUE, 0);
   gtk_signal_connect (GTK_OBJECT (tempwid), "clicked",
 		      GTK_SIGNAL_FUNC (delete_proxy_host), NULL);
@@ -1206,6 +1226,7 @@ make_proxy_hosts_tab (GtkWidget * notebook)
   gtk_signal_connect (GTK_OBJECT (proxy_list), "unselect_row", 
                       GTK_SIGNAL_FUNC (buttons_toggle), NULL);
   buttons_toggle (NULL, 0, 0, 0, NULL);
+#endif
 }
 
 
@@ -1243,6 +1264,7 @@ _init_option_data (void)
 void
 options_dialog (gpointer data)
 {
+#if 0
   gftp_config_vars * cv;
   GList * templist;
   void *value;
@@ -1314,6 +1336,7 @@ options_dialog (gpointer data)
                     G_CALLBACK (options_action), NULL);
 
   gtk_widget_show (gftp_option_data->dialog);
+#endif
 }
 
 

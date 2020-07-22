@@ -1183,7 +1183,7 @@ rfc959_setup_file_transfer (gftp_request * request, const char *filename,
   if (startsize > 0)
     {
       command = g_strdup_printf ("REST " GFTP_OFF_T_PRINTF_MOD "\r\n",
-                                 startsize);
+                                 (long) startsize);
       ret = rfc959_send_command (request, command, -1, 1, 0);
       g_free (command);
 

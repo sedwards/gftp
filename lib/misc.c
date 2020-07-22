@@ -42,7 +42,7 @@ insert_commas (off_t number, char *dest_str, size_t dest_len)
   size_t num, rem, srclen;
   size_t len, i;
 
-  g_snprintf (src, sizeof (src), GFTP_OFF_T_PRINTF_MOD, number);
+  g_snprintf (src, sizeof (src), GFTP_OFF_T_PRINTF_MOD, (long)number);
 
   if (dest_str != NULL)
     *dest_str = '\0';
@@ -321,7 +321,7 @@ gftp_info (void)
   printf ("#define _FILE_OFFSET_BITS %d\n", _FILE_OFFSET_BITS);
 #endif
 
-  printf ("sizeof (off_t) = %i\n", sizeof (off_t));
+  printf ("sizeof (off_t) = %lu\n", sizeof (off_t));
 
 #ifdef HAVE_INTL_PRINTF
   printf ("#define HAVE_INTL_PRINTF\n");
@@ -873,7 +873,7 @@ gftp_gen_ls_string (gftp_request * request, gftp_file * fle,
   if (GFTP_IS_SPECIAL_DEVICE (fle->st_mode))
     tempstr2 = g_strdup_printf ("%d, %d", major (fle->size), minor (fle->size));
   else
-    tempstr2 = g_strdup_printf (GFTP_OFF_T_11PRINTF_MOD, fle->size);
+    tempstr2 = g_strdup_printf (GFTP_OFF_T_11PRINTF_MOD, (long)fle->size);
 
   time (&t);
 
@@ -1294,10 +1294,10 @@ gftp_format_file_size(off_t bytes, char *out_buffer, size_t buffer_size) {
     snprintf(out_buffer, buffer_size, "%s MiB", tmp);
   }
   else if (bytes >= 1024) {
-    snprintf(out_buffer, buffer_size, "%jd KiB", bytes / 1024);
+    snprintf(out_buffer, buffer_size, "%lld KiB", bytes / 1024);
   }
   else {
-    snprintf(out_buffer, buffer_size, "%jd B", bytes);
+    snprintf(out_buffer, buffer_size, "%lld B", bytes);
   }
 }
 

@@ -84,9 +84,11 @@ gftpui_common_run_callback_function (gftpui_callback_data * cdata)
   if (!cdata->dont_check_connection && gftpui_check_reconnect (cdata) < 0)
     return (0);
 
+#if GTK_MAJOR_VERSION == 2
   if (gftp_protocols[cdata->request->protonum].use_threads)
     ret = GPOINTER_TO_INT (gftpui_generic_thread (_gftpui_common_thread_callback, cdata));
   else
+#endif
     ret = GPOINTER_TO_INT (cdata->run_function (cdata));
 
   if (ret == 0 && !cdata->dont_refresh)

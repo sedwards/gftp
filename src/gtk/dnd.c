@@ -122,7 +122,8 @@ openurl_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
                _("Connect"));
       return;
     }
-#if 0
+
+#if GTK_MAJOR_VERSION == 2
   if ((selection_data->length >= 0) && (selection_data->format == 8)) 
     {
       if (GFTP_IS_CONNECTED (current_wdata->request))

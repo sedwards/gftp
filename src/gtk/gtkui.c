@@ -124,7 +124,9 @@ gftpui_prompt_username (void *uidata, gftp_request * request)
   request->stopable = 1;
   while (request->stopable)
     {
+#if GTK_MAJOR_VERSION == 2
       GDK_THREADS_LEAVE ();
+#endif
       g_main_context_iteration (NULL, TRUE);
     }
 }
@@ -147,7 +149,7 @@ gftpui_prompt_password (void *uidata, gftp_request * request)
     }
 }
 
-#if 0
+#if GTK_MAJOR_VERSION == 2
 /* The wakeup main thread functions are so that after the thread terminates
    there won't be a delay in updating the GUI */
 static void
@@ -161,7 +163,6 @@ _gftpui_wakeup_main_thread (gpointer data, gint source,
   if (request->wakeup_main_thread[0] > 0)
     read (request->wakeup_main_thread[0], &c, 1);
 }
-#endif
 
 static gint
 _gftpui_setup_wakeup_main_thread (gftp_request * request)
@@ -170,11 +171,9 @@ _gftpui_setup_wakeup_main_thread (gftp_request * request)
 
   if (socketpair (AF_UNIX, SOCK_STREAM, 0, request->wakeup_main_thread) == 0)
     {
-#if 0
       handler = gdk_input_add (request->wakeup_main_thread[0],
                                GDK_INPUT_READ, _gftpui_wakeup_main_thread,
                                request);
-#endif
     }
   else
     {
@@ -185,14 +184,16 @@ _gftpui_setup_wakeup_main_thread (gftp_request * request)
 
   return (handler);
 }
-
+#endif
 
 static void
 _gftpui_teardown_wakeup_main_thread (gftp_request * request, gint handler)
 {
   if (request->wakeup_main_thread[0] > 0 && request->wakeup_main_thread[1] > 0)
     {
-      //gdk_input_remove (handler);
+#if GTK_MAJOR_VERSION == 2
+      gdk_input_remove (handler);
+#endif
       close (request->wakeup_main_thread[0]);
       close (request->wakeup_main_thread[1]);
       request->wakeup_main_thread[0] = 0;
@@ -216,6 +217,7 @@ _gftpui_gtk_thread_func (void *data)
 }
 
 
+#if GTK_MAJOR_VERSION == 2
 void *
 gftpui_generic_thread (void * (*func) (void *), void *data)
 {
@@ -256,7 +258,7 @@ gftpui_generic_thread (void * (*func) (void *), void *data)
 
   return (ret);
 }
-
+#endif
 
 int
 gftpui_check_reconnect (gftpui_callback_data * cdata)

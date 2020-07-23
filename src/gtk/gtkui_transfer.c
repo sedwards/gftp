@@ -57,6 +57,7 @@ gftpui_start_transfer (gftp_transfer * tdata)
 void
 gftpui_add_file_to_transfer (gftp_transfer * tdata, GList * curfle)
 {
+#if 0 
   gftpui_common_curtrans_data * transdata;
   char *text[2];
   gftp_file * fle;
@@ -78,6 +79,7 @@ gftpui_add_file_to_transfer (gftp_transfer * tdata, GList * curfle)
   transdata->curfle = curfle;
 
   gtk_ctree_node_set_row_data (GTK_CTREE (dlwdw), fle->user_data, transdata);
+#endif
 }
 
 

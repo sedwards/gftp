@@ -697,6 +697,7 @@ options_action (GtkWidget * widget, gint response, gpointer user_data)
 static void
 add_host_to_listbox (GList * templist)
 {
+#if 0
   gftp_proxy_hosts *hosts;
   char *add_data[2];
   int num;
@@ -726,12 +727,14 @@ add_host_to_listbox (GList * templist)
     }
 
   gtk_clist_set_row_data (GTK_CLIST (proxy_list), num, (gpointer) templist);
+#endif
 }
 
 
 static void
 add_ok (GtkWidget * widget, gpointer data)
 {
+#if 0
   gftp_proxy_hosts *hosts;
   const char *edttxt;
   GList *templist;
@@ -793,6 +796,7 @@ add_ok (GtkWidget * widget, gpointer data)
     }
 
   add_host_to_listbox (templist);
+#endif
 }
 
 
@@ -837,6 +841,7 @@ buttons_toggle (GtkWidget * widget, gint row, gint col, GdkEventButton * event, 
 static void
 delete_proxy_host (GtkWidget * widget, gpointer data)
 {
+#if 0
   GList *templist;
   int num;
 
@@ -849,6 +854,7 @@ delete_proxy_host (GtkWidget * widget, gpointer data)
   new_proxy_hosts = g_list_remove_link (new_proxy_hosts, templist);
   gtk_clist_remove (GTK_CLIST (proxy_list), num);
   buttons_toggle (NULL, 0, 0, 0, NULL);
+#endif
 }
 
 
@@ -864,11 +870,13 @@ add_proxy_host (GtkWidget * widget, gpointer data)
 
   if (data)
     {
+#if 0
       if ((templist = GTK_CLIST (proxy_list)->selection) == NULL)
 	return;
       templist = gtk_clist_get_row_data (GTK_CLIST (proxy_list), 
                                          GPOINTER_TO_INT (templist->data));
       hosts = templist->data;
+#endif
     }
   else
     {
@@ -1094,6 +1102,7 @@ add_proxy_host (GtkWidget * widget, gpointer data)
 static void
 make_proxy_hosts_tab (GtkWidget * notebook)
 {
+#if 0
   GtkWidget *tempwid, *box, *hbox, *scroll;
   gftp_config_list_vars * proxy_hosts;
   char *add_data[2];
@@ -1169,6 +1178,7 @@ make_proxy_hosts_tab (GtkWidget * notebook)
   g_signal_connect (G_OBJECT (proxy_list), "unselect_row", 
                       G_CALLBACK (buttons_toggle), NULL);
   buttons_toggle (NULL, 0, 0, 0, NULL);
+#endif
 }
 
 

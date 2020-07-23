@@ -122,7 +122,7 @@ openurl_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
                _("Connect"));
       return;
     }
-
+#if 0
   if ((selection_data->length >= 0) && (selection_data->format == 8)) 
     {
       if (GFTP_IS_CONNECTED (current_wdata->request))
@@ -137,6 +137,7 @@ openurl_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
           ftp_connect (current_wdata, current_wdata->request);
         }
     }
+#endif
 }
 
 
@@ -218,13 +219,14 @@ listbox_drag (GtkWidget * widget, GdkDragContext * context,
   }
   g_list_free (templist);
 
-
+#if 0
   if (str != NULL)
     {
       gtk_selection_data_set (selection_data, selection_data->target, 8,
       	                      (unsigned char *) str, strlen (str));
       g_free (str);
     }
+#endif
 }
 
 
@@ -233,6 +235,7 @@ listbox_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
 		       gint y, GtkSelectionData * selection_data, guint info,
 		       guint clk_time, gpointer data)
 {
+#if 0
   char *newpos, *oldpos, *tempstr;
   GList * trans_list, * templist;
   gftp_window_data * wdata;
@@ -302,4 +305,5 @@ listbox_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
     }
 
   g_list_free (trans_list);
+#endif
 }

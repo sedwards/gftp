@@ -1084,7 +1084,7 @@ on_key_press_transfer (GtkWidget * widget, GdkEventButton * event, gpointer data
 }
 
 
-
+/////////////////////////////////HACK////////////////////////////
 static GtkTreeModel *model = NULL;
 static GtkWidget *treeview;
 GtkCellRenderer *renderer;
@@ -1180,6 +1180,24 @@ add_columns (GtkTreeView *treeview)
 
 
 
+static GtkWidget *
+CreateTransferStatusWindow ()
+{
+  /* create tree model */
+  model = create_model ();
+ 
+  /* create tree view */
+  treeview = gtk_tree_view_new_with_model (model);
+  g_object_unref (model);
+  gtk_container_add (GTK_CONTAINER (sw), treeview);
+
+  /* add columns to the tree view */
+  add_columns (GTK_TREE_VIEW (treeview));
+
+  return (treeview);
+}
+ 
+
 
 static GtkWidget *
 CreateFTPWindows (GtkWidget * ui)
@@ -1251,50 +1269,20 @@ CreateFTPWindows (GtkWidget * ui)
   remote_frame = CreateFTPWindow (&window2);
 
   gtk_paned_pack2 (GTK_PANED (winpane), remote_frame, 1, 1);
-
-
-////////////////////////////////////
-
-
   dlpane = gtk_vpaned_new ();
+
   gtk_paned_pack1 (GTK_PANED (dlpane), winpane, 1, 1);
 
+
   transfer_scroll = gtk_scrolled_window_new (NULL, NULL);
+
   gftp_lookup_global_option ("transfer_height", &tmplookup);
   gtk_widget_set_size_request (transfer_scroll, -1, tmplookup);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (transfer_scroll),
 				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-  //////////////
-
   dltitles[0] = _("Filename");
   dltitles[1] = _("Progress");
-
-
-//  GtkTreeView *treeview;
-//  add_columns (GTK_TREE_VIEW (treeview));
-
-      /* create tree model */
-      model = create_model ();
-
-      /* create tree view */
-      treeview = gtk_tree_view_new_with_model (model);
-
-      g_object_unref (model);
-
-      gtk_container_add (GTK_CONTAINER (sw), treeview);
-
-      /* add columns to the tree view */
-      add_columns (GTK_TREE_VIEW (treeview));
-
-/* finish & show */
-//      gtk_window_set_default_size (GTK_WINDOW (treeview), 50, 50);
-
-
-///////////////////////////////
-
-
-
 
 #if GTK_MAJOR_VERSION == 2
   dlwdw = gtk_ctree_new_with_titles (2, 0, dltitles);
@@ -1311,22 +1299,19 @@ CreateFTPWindows (GtkWidget * ui)
     gtk_clist_set_column_width (GTK_CLIST (dlwdw), 0, tmplookup);
 #endif
 
-
-//////////////////////////////////////////////////
-
   gtk_container_add (GTK_CONTAINER (transfer_scroll), dlwdw);
   g_signal_connect (G_OBJECT (dlwdw), "button_press_event",
         G_CALLBACK (on_key_press_transfer), NULL);
-//  gtk_paned_pack2 (GTK_PANED (dlpane), transfer_scroll, 1, 1);
+#if GTK_MAJOR_VERSION == 2
+    gtk_paned_pack2 (GTK_PANED (dlpane), transfer_scroll, 1, 1);
+#endif
+
+#if GTK_MAJOR_VERSION == 3
+  tempwid = CreateTransferStatusWindow ();
   gtk_paned_pack2 (GTK_PANED (dlpane), treeview, 1, 1);
+#endif
 
 
-    
-
-
-
-
-////////////////////////////
 
 
   logpane = gtk_vpaned_new ();

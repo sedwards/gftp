@@ -223,7 +223,7 @@ listbox_drag (GtkWidget * widget, GdkDragContext * context,
   if (str != NULL)
     {
 #if GTK_MAJOR_VERSION == 2
-      gtk_selection_data_set (selection_data, selection_datat->target, 8,
+      gtk_selection_data_set (selection_data, selection_data->target, 8,
 #else
       gtk_selection_data_set (selection_data, selection_data, 8,
 #endif

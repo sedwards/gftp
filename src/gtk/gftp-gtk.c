@@ -1084,6 +1084,103 @@ on_key_press_transfer (GtkWidget * widget, GdkEventButton * event, gpointer data
 }
 
 
+
+static GtkTreeModel *model = NULL;
+static GtkWidget *treeview;
+GtkCellRenderer *renderer;
+GtkTreeViewColumn *column;
+GtkWidget *sw;
+
+
+typedef struct
+{
+  const gchar    *fixed;
+  const gchar    *number;
+}
+Bug;
+
+static Bug data[] =
+{
+  //{ FALSE, 60482, "Normal",     "scrollable notebooks and hidden tabs" },
+  //{ FALSE, 60620, "Critical",   "gdk_window_clear_area (gdkwindow-win32.c) is not thread-safe" },
+  {  "Normal",     "scrollable notebooks and hidden tabs" },
+  {  "Critical",   "gdk_window_clear_area (gdkwindow-win32.c) is not thread-safe" },
+};
+
+enum
+{
+  COLUMN_FIXED,
+  COLUMN_NUMBER,
+  NUM_COLUMNS
+};
+
+
+static GtkTreeModel *
+create_model (void)
+{
+  gint i = 0;
+  GtkListStore *store;
+  GtkTreeIter iter;
+
+  /* create list store */
+  store = gtk_list_store_new (NUM_COLUMNS,
+                              G_TYPE_STRING,
+                              G_TYPE_STRING);
+
+  /* add data to the list store */
+  for (i = 0; i < G_N_ELEMENTS (data); i++)
+    {
+      gchar *icon_name;
+
+      gtk_list_store_append (store, &iter);
+      gtk_list_store_set (store, &iter,
+                          COLUMN_FIXED, 0,
+                          COLUMN_NUMBER, 0,
+                          -1);
+    }
+
+  return GTK_TREE_MODEL (store);
+}
+
+
+static void
+add_columns (GtkTreeView *treeview)
+{
+  GtkCellRenderer *renderer;
+  GtkTreeViewColumn *column;
+  GtkTreeModel *model = gtk_tree_view_get_model (treeview);
+
+  /* column for fixed toggles */
+  renderer = gtk_cell_renderer_toggle_new ();
+  //g_signal_connect (renderer, "toggled",
+    //                G_CALLBACK (fixed_toggled), model);
+
+  column = gtk_tree_view_column_new_with_attributes ("Fixed?",
+                                                     renderer,
+                                                     "active", COLUMN_FIXED,
+                                                     NULL);
+
+  /* set this column to a fixed sizing (of 50 pixels) */
+  gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (column),
+                                   GTK_TREE_VIEW_COLUMN_FIXED);
+  gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (column), 50);
+  gtk_tree_view_append_column (treeview, column);
+
+  /* column for bug numbers */
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("Bug number",
+                                                     renderer,
+                                                     "text",
+                                                     COLUMN_NUMBER,
+                                                     NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_NUMBER);
+  gtk_tree_view_append_column (treeview, column);
+}
+
+
+
+
+
 static GtkWidget *
 CreateFTPWindows (GtkWidget * ui)
 {
@@ -1155,6 +1252,10 @@ CreateFTPWindows (GtkWidget * ui)
 
   gtk_paned_pack2 (GTK_PANED (winpane), remote_frame, 1, 1);
 
+
+////////////////////////////////////
+
+
   dlpane = gtk_vpaned_new ();
   gtk_paned_pack1 (GTK_PANED (dlpane), winpane, 1, 1);
 
@@ -1164,8 +1265,36 @@ CreateFTPWindows (GtkWidget * ui)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (transfer_scroll),
 				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
+  //////////////
+
   dltitles[0] = _("Filename");
   dltitles[1] = _("Progress");
+
+
+//  GtkTreeView *treeview;
+//  add_columns (GTK_TREE_VIEW (treeview));
+
+      /* create tree model */
+      model = create_model ();
+
+      /* create tree view */
+      treeview = gtk_tree_view_new_with_model (model);
+
+      g_object_unref (model);
+
+      gtk_container_add (GTK_CONTAINER (sw), treeview);
+
+      /* add columns to the tree view */
+      add_columns (GTK_TREE_VIEW (treeview));
+
+/* finish & show */
+//      gtk_window_set_default_size (GTK_WINDOW (treeview), 50, 50);
+
+
+///////////////////////////////
+
+
+
 
 #if GTK_MAJOR_VERSION == 2
   dlwdw = gtk_ctree_new_with_titles (2, 0, dltitles);
@@ -1182,10 +1311,23 @@ CreateFTPWindows (GtkWidget * ui)
     gtk_clist_set_column_width (GTK_CLIST (dlwdw), 0, tmplookup);
 #endif
 
+
+//////////////////////////////////////////////////
+
   gtk_container_add (GTK_CONTAINER (transfer_scroll), dlwdw);
   g_signal_connect (G_OBJECT (dlwdw), "button_press_event",
         G_CALLBACK (on_key_press_transfer), NULL);
-  gtk_paned_pack2 (GTK_PANED (dlpane), transfer_scroll, 1, 1);
+//  gtk_paned_pack2 (GTK_PANED (dlpane), transfer_scroll, 1, 1);
+  gtk_paned_pack2 (GTK_PANED (dlpane), treeview, 1, 1);
+
+
+    
+
+
+
+
+////////////////////////////
+
 
   logpane = gtk_vpaned_new ();
   gtk_paned_pack1 (GTK_PANED (logpane), dlpane, 1, 1);

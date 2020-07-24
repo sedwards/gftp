@@ -452,7 +452,6 @@ check_done_process (void)
 static void
 on_next_transfer (gftp_transfer * tdata)
 {
-#if 0
   intptr_t refresh_files;
   gftp_file * tempfle;
 
@@ -471,13 +470,14 @@ on_next_transfer (gftp_transfer * tdata)
         }
       else if (tempfle->done_rm)
         tdata->fromreq->rmfile (tdata->fromreq, tempfle->file);
-     
+#if GTK_MAJOR_VERSION == 2
       if (tempfle->transfer_action == GFTP_TRANS_ACTION_SKIP)
         gtk_ctree_node_set_text (GTK_CTREE (dlwdw), tempfle->user_data, 1,
                                  _("Skipped"));
       else
         gtk_ctree_node_set_text (GTK_CTREE (dlwdw), tempfle->user_data, 1,
                                  _("Finished"));
+#endif
     }
 
   gftp_lookup_request_option (tdata->fromreq, "refresh_files", &refresh_files);
@@ -486,7 +486,6 @@ on_next_transfer (gftp_transfer * tdata)
       compare_request (tdata->toreq, 
                        ((gftp_window_data *) tdata->towdata)->request, 1))
     gftpui_refresh (tdata->towdata, 1);
-#endif
 }
 
 

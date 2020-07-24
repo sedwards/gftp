@@ -352,7 +352,6 @@ update_window (gftp_window_data * wdata)
 gftp_graphic *
 open_xpm (GtkWidget * widget, char *filename)
 {
-#if 0
   gftp_graphic * graphic;
   GtkStyle *style;
   char *exfile;
@@ -366,8 +365,13 @@ open_xpm (GtkWidget * widget, char *filename)
     return (NULL);
 
   graphic = g_malloc0 (sizeof (*graphic));
+#if GTK_MAJOR_VERSION == 2
   graphic->pixmap = gdk_pixmap_create_from_xpm (widget->window, 
                         &graphic->bitmap, &style->bg[GTK_STATE_NORMAL], exfile);
+#else
+  graphic->pixmap = gdk_pixbuf_new_from_file(exfile,GDK_PIXBUF_ERROR);
+#endif
+
   g_free (exfile);
 
   if (graphic->pixmap == NULL)
@@ -382,8 +386,6 @@ open_xpm (GtkWidget * widget, char *filename)
   g_hash_table_insert (graphic_hash_table, graphic->filename, graphic);
 
   return (graphic);
-#endif
-   return (NULL);
 }
 
 

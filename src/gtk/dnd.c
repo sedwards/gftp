@@ -220,14 +220,16 @@ listbox_drag (GtkWidget * widget, GdkDragContext * context,
   }
   g_list_free (templist);
 
-#if 0
   if (str != NULL)
     {
-      gtk_selection_data_set (selection_data, selection_data->target, 8,
+#if GTK_MAJOR_VERSION == 2
+      gtk_selection_data_set (selection_data, selection_datat->target, 8,
+#else
+      gtk_selection_data_set (selection_data, selection_data, 8,
+#endif
       	                      (unsigned char *) str, strlen (str));
       g_free (str);
     }
-#endif
 }
 
 

@@ -238,7 +238,6 @@ listbox_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
 		       gint y, GtkSelectionData * selection_data, guint info,
 		       guint clk_time, gpointer data)
 {
-#if 0
   char *newpos, *oldpos, *tempstr;
   GList * trans_list, * templist;
   gftp_window_data * wdata;
@@ -252,9 +251,17 @@ listbox_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
 
   trans_list = NULL;
   finish_drag = 0;
+#if GTK_MAJOR_VERSION == 2
   if ((selection_data->length >= 0) && (selection_data->format == 8)) 
+#else
+  if ((selection_data >= 0) && (selection_data == 8)) 
+#endif
     {
+#if GTK_MAJOR_VERSION == 2
       oldpos = (char *) selection_data->data;
+#else
+      oldpos = (char *) selection_data;
+#endif
       while ((newpos = strchr (oldpos, '\n')) || 
              (newpos = strchr (oldpos, '\0'))) 
         {
@@ -308,5 +315,4 @@ listbox_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
     }
 
   g_list_free (trans_list);
-#endif
 }

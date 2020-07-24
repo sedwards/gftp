@@ -1155,7 +1155,7 @@ add_columns (GtkTreeView *treeview)
   //g_signal_connect (renderer, "toggled",
     //                G_CALLBACK (fixed_toggled), model);
 
-  column = gtk_tree_view_column_new_with_attributes ("Fixed?",
+  column = gtk_tree_view_column_new_with_attributes ("Filename",
                                                      renderer,
                                                      "active", COLUMN_FIXED,
                                                      NULL);
@@ -1168,7 +1168,7 @@ add_columns (GtkTreeView *treeview)
 
   /* column for bug numbers */
   renderer = gtk_cell_renderer_text_new ();
-  column = gtk_tree_view_column_new_with_attributes ("Bug number",
+  column = gtk_tree_view_column_new_with_attributes ("Progress",
                                                      renderer,
                                                      "text",
                                                      COLUMN_NUMBER,

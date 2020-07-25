@@ -1101,8 +1101,6 @@ Bug;
 
 static Bug data[] =
 {
-  //{ FALSE, 60482, "Normal",     "scrollable notebooks and hidden tabs" },
-  //{ FALSE, 60620, "Critical",   "gdk_window_clear_area (gdkwindow-win32.c) is not thread-safe" },
   {  "Normal",     "scrollable notebooks and hidden tabs" },
   {  "Critical",   "gdk_window_clear_area (gdkwindow-win32.c) is not thread-safe" },
 };
@@ -1143,9 +1141,19 @@ create_model (void)
 }
 
 
-static void
-add_columns (GtkTreeView *treeview)
+static GtkWidget *
+CreateTransferStatusWindow ()
 {
+  /* create tree model */
+  model = create_model ();
+ 
+  /* create tree view */
+  treeview = gtk_tree_view_new_with_model (model);
+  g_object_unref (model);
+  gtk_container_add (GTK_CONTAINER (sw), treeview);
+
+  /* add columns to the tree view */
+
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
   GtkTreeModel *model = gtk_tree_view_get_model (treeview);
@@ -1175,24 +1183,6 @@ add_columns (GtkTreeView *treeview)
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_NUMBER);
   gtk_tree_view_append_column (treeview, column);
-}
-
-
-
-
-static GtkWidget *
-CreateTransferStatusWindow ()
-{
-  /* create tree model */
-  model = create_model ();
- 
-  /* create tree view */
-  treeview = gtk_tree_view_new_with_model (model);
-  g_object_unref (model);
-  gtk_container_add (GTK_CONTAINER (sw), treeview);
-
-  /* add columns to the tree view */
-  add_columns (GTK_TREE_VIEW (treeview));
 
   return (treeview);
 }
@@ -1305,6 +1295,9 @@ CreateFTPWindows (GtkWidget * ui)
 #if GTK_MAJOR_VERSION == 2
     gtk_paned_pack2 (GTK_PANED (dlpane), transfer_scroll, 1, 1);
 #endif
+
+
+    /// New Code for File Status Transfer Window ///
 
 #if GTK_MAJOR_VERSION == 3
   tempwid = CreateTransferStatusWindow ();

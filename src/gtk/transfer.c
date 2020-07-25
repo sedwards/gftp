@@ -470,13 +470,14 @@ on_next_transfer (gftp_transfer * tdata)
         }
       else if (tempfle->done_rm)
         tdata->fromreq->rmfile (tdata->fromreq, tempfle->file);
-      
+#if GTK_MAJOR_VERSION == 2
       if (tempfle->transfer_action == GFTP_TRANS_ACTION_SKIP)
         gtk_ctree_node_set_text (GTK_CTREE (dlwdw), tempfle->user_data, 1,
                                  _("Skipped"));
       else
         gtk_ctree_node_set_text (GTK_CTREE (dlwdw), tempfle->user_data, 1,
                                  _("Finished"));
+#endif
     }
 
   gftp_lookup_request_option (tdata->fromreq, "refresh_files", &refresh_files);
@@ -509,8 +510,8 @@ cancel_get_trans_password (gftp_transfer * tdata, gftp_dialog_data * ddata)
 static void
 show_transfer (gftp_transfer * tdata)
 {
-  GdkPixmap * closedir_pixmap, * opendir_pixmap;
-  GdkBitmap * closedir_bitmap, * opendir_bitmap;
+  cairo_surface_t * closedir_pixmap, * opendir_pixmap;
+  cairo_surface_t * closedir_bitmap, * opendir_bitmap;
   gftpui_common_curtrans_data * transdata;
   gftp_file * tempfle;
   GList * templist;
@@ -521,6 +522,7 @@ show_transfer (gftp_transfer * tdata)
 
   text[0] = tdata->fromreq->hostname;
   text[1] = _("Waiting...");
+#if GTK_MAJOR_VERSION == 2
   tdata->user_data = gtk_ctree_insert_node (GTK_CTREE (dlwdw), NULL, NULL, 
                                        text, 5,
                                        closedir_pixmap, closedir_bitmap, 
@@ -558,7 +560,7 @@ show_transfer (gftp_transfer * tdata)
       gtk_ctree_node_set_row_data (GTK_CTREE (dlwdw), tempfle->user_data, 
                                    transdata);
     }
-
+#endif
   if (!tdata->toreq->stopable && gftp_need_password (tdata->toreq))
     {
       tdata->toreq->stopable = 1;
@@ -624,6 +626,7 @@ transfer_done (GList * node)
   if ((!tdata->show && tdata->started) ||
       (tdata->done && !tdata->started))
     {
+#if GTK_MAJOR_VERSION == 2
       transdata = gtk_ctree_node_get_row_data (GTK_CTREE (dlwdw), 
                                                tdata->user_data);
       if (transdata != NULL)
@@ -637,8 +640,8 @@ transfer_done (GList * node)
           if (transdata != NULL)
             g_free (transdata);
         }
-          
       gtk_ctree_remove_node (GTK_CTREE (dlwdw), tdata->user_data);
+#endif
     }
 
   g_mutex_lock (&gftpui_common_transfer_mutex);
@@ -688,8 +691,10 @@ create_transfer (gftp_transfer * tdata)
   num_transfers_in_progress++;
   tdata->started = 1;
   tdata->stalled = 1;
+#if GTK_MAJOR_VERSION == 2
   gtk_ctree_node_set_text (GTK_CTREE (dlwdw), tdata->user_data, 1,
                            _("Connecting..."));
+#endif
 
   if (tdata->thread_id == NULL)
     tdata->thread_id = g_malloc0 (sizeof (pthread_t));
@@ -815,7 +820,9 @@ update_file_status (gftp_transfer * tdata)
 
   g_mutex_unlock (&tdata->statmutex);
 
+#if GTK_MAJOR_VERSION == 2
   gtk_ctree_node_set_text (GTK_CTREE (dlwdw), tdata->user_data, 1, totstr);
+#endif
   
   gftp_lookup_global_option ("show_trans_in_title", &show_trans_in_title);
   if (gftp_file_transfers->data == tdata && show_trans_in_title)
@@ -825,8 +832,10 @@ update_file_status (gftp_transfer * tdata)
                             winstr);
     }
 
+#if GTK_MAJOR_VERSION == 2
   if (*dlstr != '\0')
     gtk_ctree_node_set_text (GTK_CTREE (dlwdw), tempfle->user_data, 1, dlstr);
+#endif
 }
 
 
@@ -916,6 +925,7 @@ update_downloads (gpointer data)
 void
 start_transfer (gpointer data)
 {
+#if GTK_MAJOR_VERSION == 2
   gftpui_common_curtrans_data * transdata;
   GtkCTreeNode * node;
 
@@ -932,12 +942,14 @@ start_transfer (gpointer data)
   if (!transdata->transfer->started)
     create_transfer (transdata->transfer);
   g_mutex_unlock (&transdata->transfer->structmutex);
+#endif
 }
 
 
 void
 stop_transfer (gpointer data)
 {
+#if GTK_MAJOR_VERSION == 2
   gftpui_common_curtrans_data * transdata;
   GtkCTreeNode * node;
 
@@ -951,12 +963,14 @@ stop_transfer (gpointer data)
   node = GTK_CLIST (dlwdw)->selection->data;
   transdata = gtk_ctree_node_get_row_data (GTK_CTREE (dlwdw), node);
   gftpui_common_cancel_file_transfer (transdata->transfer);
+#endif
 }
 
 
 void
 skip_transfer (gpointer data)
 {
+#if GTK_MAJOR_VERSION == 2
   gftpui_common_curtrans_data * transdata;
   GtkCTreeNode * node;
 
@@ -972,12 +986,14 @@ skip_transfer (gpointer data)
 
   gftpui_common_skip_file_transfer (transdata->transfer,
                                     transdata->transfer->curfle->data);
+#endif
 }
 
 
 void
 remove_file_transfer (gpointer data)
 {
+#if GTK_MAJOR_VERSION == 2
   gftpui_common_curtrans_data * transdata;
   GtkCTreeNode * node;
   gftp_file * curfle;
@@ -1000,12 +1016,14 @@ remove_file_transfer (gpointer data)
 
   gtk_ctree_node_set_text (GTK_CTREE (dlwdw), curfle->user_data, 1,
                            _("Skipped"));
+#endif
 }
 
 
 void
 move_transfer_up (gpointer data)
 {
+#if GTK_MAJOR_VERSION == 2
   GList * firstentry, * secentry, * lastentry;
   gftpui_common_curtrans_data * transdata;
   GtkCTreeNode * node;
@@ -1060,12 +1078,14 @@ move_transfer_up (gpointer data)
                           ((gftp_file *) transdata->curfle->next->data)->user_data: NULL);
     }
   g_mutex_unlock (&transdata->transfer->structmutex);
+#endif
 }
 
 
 void
 move_transfer_down (gpointer data)
 {
+#if GTK_MAJOR_VERSION == 2
   GList * firstentry, * secentry, * lastentry;
   gftpui_common_curtrans_data * transdata;
   GtkCTreeNode * node;
@@ -1120,5 +1140,6 @@ move_transfer_down (gpointer data)
                           ((gftp_file *) transdata->curfle->next->data)->user_data: NULL);
     }
   g_mutex_unlock (&transdata->transfer->structmutex);
+#endif
 }
 

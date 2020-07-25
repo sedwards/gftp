@@ -147,7 +147,7 @@ gftpui_prompt_password (void *uidata, gftp_request * request)
     }
 }
 
-
+#if GTK_MAJOR_VERSION == 2
 /* The wakeup main thread functions are so that after the thread terminates
    there won't be a delay in updating the GUI */
 static void
@@ -161,7 +161,7 @@ _gftpui_wakeup_main_thread (gpointer data, gint source,
   if (request->wakeup_main_thread[0] > 0)
     read (request->wakeup_main_thread[0], &c, 1);
 }
-
+#endif
 
 static gint
 _gftpui_setup_wakeup_main_thread (gftp_request * request)
@@ -170,9 +170,11 @@ _gftpui_setup_wakeup_main_thread (gftp_request * request)
 
   if (socketpair (AF_UNIX, SOCK_STREAM, 0, request->wakeup_main_thread) == 0)
     {
+#if GTK_MAJOR_VERSION == 2
       handler = gdk_input_add (request->wakeup_main_thread[0],
                                GDK_INPUT_READ, _gftpui_wakeup_main_thread,
                                request);
+#endif
     }
   else
     {
@@ -190,7 +192,9 @@ _gftpui_teardown_wakeup_main_thread (gftp_request * request, gint handler)
 {
   if (request->wakeup_main_thread[0] > 0 && request->wakeup_main_thread[1] > 0)
     {
+#if GTK_MAJOR_VERSION == 2
       gdk_input_remove (handler);
+#endif
       close (request->wakeup_main_thread[0]);
       close (request->wakeup_main_thread[1]);
       request->wakeup_main_thread[0] = 0;

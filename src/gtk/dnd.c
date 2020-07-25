@@ -123,6 +123,7 @@ openurl_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
       return;
     }
 
+#if GTK_MAJOR_VERSION == 2
   if ((selection_data->length >= 0) && (selection_data->format == 8)) 
     {
       if (GFTP_IS_CONNECTED (current_wdata->request))
@@ -137,6 +138,7 @@ openurl_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
           ftp_connect (current_wdata, current_wdata->request);
         }
     }
+#endif
 }
 
 
@@ -218,10 +220,13 @@ listbox_drag (GtkWidget * widget, GdkDragContext * context,
   }
   g_list_free (templist);
 
-
   if (str != NULL)
     {
+#if GTK_MAJOR_VERSION == 2
       gtk_selection_data_set (selection_data, selection_data->target, 8,
+#else
+      gtk_selection_data_set (selection_data, selection_data, 8,
+#endif
       	                      (unsigned char *) str, strlen (str));
       g_free (str);
     }
@@ -246,9 +251,17 @@ listbox_get_drag_data (GtkWidget * widget, GdkDragContext * context, gint x,
 
   trans_list = NULL;
   finish_drag = 0;
+#if GTK_MAJOR_VERSION == 2
   if ((selection_data->length >= 0) && (selection_data->format == 8)) 
+#else
+  if ((selection_data >= 0) && (selection_data == 8)) 
+#endif
     {
+#if GTK_MAJOR_VERSION == 2
       oldpos = (char *) selection_data->data;
+#else
+      oldpos = (char *) selection_data;
+#endif
       while ((newpos = strchr (oldpos, '\n')) || 
              (newpos = strchr (oldpos, '\0'))) 
         {

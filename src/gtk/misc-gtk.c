@@ -102,7 +102,9 @@ ftp_log (gftp_logging_level level, gftp_request * request,
         }
     }
 
+#if GTK_MAJOR_VERSION == 2
   upd = logwdw_vadj->upper - logwdw_vadj->page_size == logwdw_vadj->value;
+#endif
 
   gftp_lookup_global_option ("max_log_window_size", &max_log_window_size);
 
@@ -365,8 +367,12 @@ open_xpm (GtkWidget * widget, char *filename)
     return (NULL);
 
   graphic = g_malloc0 (sizeof (*graphic));
+
+#if GTK_MAJOR_VERSION == 2
   graphic->pixmap = gdk_pixmap_create_from_xpm (widget->window, 
                         &graphic->bitmap, &style->bg[GTK_STATE_NORMAL], exfile);
+#endif
+
   g_free (exfile);
 
   if (graphic->pixmap == NULL)
@@ -402,8 +408,8 @@ gftp_free_pixmap (char *filename)
 
 
 void
-gftp_get_pixmap (GtkWidget * widget, char *filename, GdkPixmap ** pix,
-                 GdkBitmap ** bitmap)
+gftp_get_pixmap (GtkWidget * widget, char *filename, cairo_surface_t ** pix,
+                 cairo_surface_t ** bitmap)
 {
   gftp_graphic * graphic;
 

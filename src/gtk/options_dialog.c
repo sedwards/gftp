@@ -697,6 +697,7 @@ options_action (GtkWidget * widget, gint response, gpointer user_data)
 static void
 add_host_to_listbox (GList * templist)
 {
+#if GTK_MAJOR_VERSION == 2
   gftp_proxy_hosts *hosts;
   char *add_data[2];
   int num;
@@ -726,6 +727,7 @@ add_host_to_listbox (GList * templist)
     }
 
   gtk_clist_set_row_data (GTK_CLIST (proxy_list), num, (gpointer) templist);
+#endif
 }
 
 
@@ -747,9 +749,11 @@ add_ok (GtkWidget * widget, gpointer data)
     }
   else
     {
+#if GTK_MAJOR_VERSION == 2
       num = gtk_clist_find_row_from_data (GTK_CLIST (proxy_list), templist);
       if (num != -1)
 	gtk_clist_remove (GTK_CLIST (proxy_list), num);
+#endif
       hosts = templist->data;
     }
 
@@ -837,6 +841,7 @@ buttons_toggle (GtkWidget * widget, gint row, gint col, GdkEventButton * event, 
 static void
 delete_proxy_host (GtkWidget * widget, gpointer data)
 {
+#if GTK_MAJOR_VERSION == 2
   GList *templist;
   int num;
 
@@ -844,11 +849,13 @@ delete_proxy_host (GtkWidget * widget, gpointer data)
 
   if ((templist = GTK_CLIST (proxy_list)->selection) == NULL)
     return;
+
   num = GPOINTER_TO_INT (templist->data);
   templist = gtk_clist_get_row_data (GTK_CLIST (proxy_list), num);
   new_proxy_hosts = g_list_remove_link (new_proxy_hosts, templist);
   gtk_clist_remove (GTK_CLIST (proxy_list), num);
   buttons_toggle (NULL, 0, 0, 0, NULL);
+#endif
 }
 
 
@@ -864,11 +871,13 @@ add_proxy_host (GtkWidget * widget, gpointer data)
 
   if (data)
     {
+#if GTK_MAJOR_VERSION == 2
       if ((templist = GTK_CLIST (proxy_list)->selection) == NULL)
 	return;
       templist = gtk_clist_get_row_data (GTK_CLIST (proxy_list), 
                                          GPOINTER_TO_INT (templist->data));
       hosts = templist->data;
+#endif
     }
   else
     {
@@ -1115,11 +1124,13 @@ make_proxy_hosts_tab (GtkWidget * notebook)
 				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (box), scroll, TRUE, TRUE, 0);
 
+#if GTK_MAJOR_VERSION == 2
   proxy_list = gtk_clist_new_with_titles (2, add_data);
   gtk_container_add (GTK_CONTAINER (scroll), proxy_list);
   gtk_clist_set_column_auto_resize (GTK_CLIST (proxy_list), 0, TRUE);
   gtk_clist_set_column_auto_resize (GTK_CLIST (proxy_list), 1, TRUE);
   gtk_widget_show (proxy_list);
+#endif
   gtk_widget_show (scroll);
 
   gftp_lookup_global_option ("dont_use_proxy", &proxy_hosts);

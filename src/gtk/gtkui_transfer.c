@@ -69,6 +69,7 @@ gftpui_add_file_to_transfer (gftp_transfer * tdata, GList * curfle)
   else
     text[1] = _("Waiting...");
 
+#if GTK_MAJOR_VERSION == 2
   fle->user_data = gtk_ctree_insert_node (GTK_CTREE (dlwdw),
                                           tdata->user_data, NULL, text, 5,
                                           NULL, NULL, NULL, NULL,
@@ -78,6 +79,7 @@ gftpui_add_file_to_transfer (gftp_transfer * tdata, GList * curfle)
   transdata->curfle = curfle;
 
   gtk_ctree_node_set_row_data (GTK_CTREE (dlwdw), fle->user_data, transdata);
+#endif
 }
 
 

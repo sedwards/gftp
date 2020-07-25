@@ -379,7 +379,9 @@ view_file (char *filename, int fd, unsigned int viewedit, unsigned int del_file,
 
   gtk_widget_show (dialog);
 
+#if GTK_MAJOR_VERSION == 2
   if (!start_pos)
     gtk_adjustment_set_value (vadj, vadj->upper);
+#endif
 }
 

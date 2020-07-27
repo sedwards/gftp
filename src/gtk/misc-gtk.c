@@ -350,11 +350,12 @@ update_window (gftp_window_data * wdata)
 
 
 gftp_graphic *
-open_xpm (GtkWidget * widget, char *filename)
+open_png (GtkWidget * widget, char *filename)
 {
   gftp_graphic * graphic;
   GtkStyle *style;
   char *exfile;
+  GError *gerror;
 
   if ((graphic = g_hash_table_lookup (graphic_hash_table, filename)) != NULL)
     return (graphic);
@@ -365,8 +366,18 @@ open_xpm (GtkWidget * widget, char *filename)
     return (NULL);
 
   graphic = g_malloc0 (sizeof (*graphic));
-  graphic->pixmap = gdk_pixmap_create_from_xpm (widget->window, 
-                        &graphic->bitmap, &style->bg[GTK_STATE_NORMAL], exfile);
+
+  /* This actually works for png images as well */
+#if GTK_MAJOR_VERSION == 2
+   graphic->pixmap = gdk_pixmap_create_from_xpm (widget,
+                         &graphic->bitmap, &style->bg[GTK_STATE_NORMAL], exfile);
+#else
+   graphic->pixmap = gdk_pixbuf_new_from_file(&graphic->bitmap, &gerror);
+#endif
+
+   if ((graphic = g_hash_table_lookup (graphic_hash_table, filename)) != NULL)
+     return (graphic);
+
   g_free (exfile);
 
   if (graphic->pixmap == NULL)
@@ -415,7 +426,7 @@ gftp_get_pixmap (GtkWidget * widget, char *filename, GdkPixmap ** pix,
     }
 
   if ((graphic = g_hash_table_lookup (graphic_hash_table, filename)) == NULL)
-    graphic = open_xpm (widget, filename);
+    graphic = open_png (widget, filename);
 
   if (graphic == NULL)
     {

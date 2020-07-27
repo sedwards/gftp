@@ -287,7 +287,7 @@ void update_window_info				( void );
 
 void update_window				( gftp_window_data * wdata );
 
-gftp_graphic * open_xpm				( GtkWidget * widget,
+gftp_graphic * open_png				( GtkWidget * widget,
 						  char *filename );
 
 void gftp_free_pixmap 				( char *filename ); 

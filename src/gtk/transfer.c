@@ -523,27 +523,34 @@ cancel_get_trans_password (gftp_transfer * tdata, gftp_dialog_data * ddata)
   gftpui_common_cancel_file_transfer (tdata);
 }
 
-
+/* This will be replaced with a proper Listview that can call GtkPixbuf to build icons */
 static void
 show_transfer (gftp_transfer * tdata)
 {
   DEBUG_PRINT_FUNC
-  GdkPixmap * closedir_pixmap, * opendir_pixmap;
-  GdkBitmap * closedir_bitmap, * opendir_bitmap;
   gftpui_common_curtrans_data * transdata;
   gftp_file * tempfle;
   GList * templist;
   char *text[2];
 
-  gftp_get_pixmap (dlwdw, "open_dir.png", &opendir_pixmap, &opendir_bitmap);
-  gftp_get_pixmap (dlwdw, "dir.png", &closedir_pixmap, &closedir_bitmap);
+  /* The ctree used to call these functions to build the pixmap for
+   open and closed directories in the transfer middle frame:
+
+     gftp_get_pixmap (dlwdw, "open_dir.png", &opendir_pixmap, &opendir_bitmap);
+     gftp_get_pixmap (dlwdw, "dir.png", &closedir_pixmap, &closedir_bitmap);
+
+   We will replace this with a treeview and attempt to build icons using
+   the replacement function:
+
+     GdkPixbuf * gftp_get_pixbuf (char *filename)
+   */
 
   text[0] = tdata->fromreq->hostname;
   text[1] = _("Waiting...");
   tdata->user_data = gtk_ctree_insert_node (GTK_CTREE (dlwdw), NULL, NULL, 
                                        text, 5,
-                                       closedir_pixmap, closedir_bitmap, 
-                                       opendir_pixmap, opendir_bitmap, 
+                                       NULL, NULL,
+                                       NULL, NULL,
                                        FALSE, 
                                        tdata->numdirs + tdata->numfiles < 50);
   transdata = g_malloc0 (sizeof (*transdata));

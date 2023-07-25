@@ -15,14 +15,19 @@ AC_PROG_RANLIB
 #L#T_INIT
 
 AC_ARG_ENABLE(gtk2, 
-              [  --disable-gtk2          Do not look for GTK+ 2.0 libraries], 
+              [  --enable-gtk2           Enable GTK+ 2.0 libraries],
               enable_gtk2=$enableval, 
-              enable_gtk2="yes")
+              enable_gtk2="no")
 
 AC_ARG_ENABLE(gtk3,
-              [  --enable-gtk3           Enable GTK+ 3.0 (Experimental)],
+              [  --disable-gtk3          Disable using GTK+ 3.0 in build],
               enable_gtk3=$enableval,
-              enable_gtk3="no")
+              enable_gtk3="yes")
+
+AC_ARG_ENABLE(gtk4,
+              [  --enable-gtk4           Enable GTK+ 4.0 (Experimental)],
+              enable_gtk4=$enableval,
+              enable_gtk4="no")
 
 AC_ARG_ENABLE(gtk4,
               [  --enable-gtk4           Enable GTK+ 4.0 (Experimental)],
@@ -30,7 +35,7 @@ AC_ARG_ENABLE(gtk4,
               enable_gtk4="no")
 
 AC_ARG_ENABLE(gtkport, 
-              [  --disable-gtkport       Disable compiling the GTK+ port], 
+              [  --disable-gtkport       Disable compiling the GTK+ port (Unsupported)],
               enable_gtkport=$enableval, 
               enable_gtkport="yes")
 
@@ -119,6 +124,10 @@ PKG_CHECK_MODULES(
   )
 
 if test "x$enable_gtkport" = "xyes" ; then
+   if test "x$enable_gtk2" = "xyes" ; then
+    enable_gtk3=no
+    enable_gtk4=no
+  fi
   if test "x$enable_gtk3" = "xyes" ; then
     enable_gtk2=no
     enable_gtk4=no
@@ -129,7 +138,7 @@ if test "x$enable_gtkport" = "xyes" ; then
   fi
   if test "x$enable_gtk2" = "xyes" ; then
     dnl Test for gtk+-2.0
-    PKG_CHECK_MODULES([GTK], [gtk+-2.0 >= 2.14.0], GFTP_GTK=gftp-gtk, AC_MSG_ERROR(You have GLIB 2.0 installed but I cannot find GTK+ 2.0. Run configure with --disable-gtk2 or install GTK+ 2.0))
+    PKG_CHECK_MODULES([GTK], [gtk+-2.0 >= 2.14.0], GFTP_GTK=gftp-gtk, AC_MSG_ERROR(You have GLIB 2.0 installed but I cannot find GTK+ 2.0. Run configure with --enable-gtk2 or install GTK+ 2.0))
     PKG_CHECK_MODULES([GTHREAD], gthread-2.0 >=  2.18.0, HAVE_GTHREADS="yes")
   fi
   if test "x$enable_gtk3" = "xyes" ; then
@@ -202,3 +211,15 @@ AC_CONFIG_FILES(
 	po/Makefile
 )
 AC_OUTPUT
+
+AS_ECHO("
+$as_me: Finished.  Do '${ac_make}' to compile gftp.
+") >&AS_MESSAGE_FD
+
+dnl Local Variables:
+dnl comment-start: "dnl "
+dnl comment-end: ""
+dnl comment-start-skip: "\\bdnl\\b\\s *"
+dnl compile-command: "autoreconf --warnings=all"
+dnl End:
+

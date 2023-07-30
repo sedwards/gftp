@@ -409,9 +409,6 @@ void about_dialog (gpointer data)
     gtk_window_set_modal (GTK_WINDOW (w), TRUE);
     gtk_window_set_position (GTK_WINDOW (w), GTK_WIN_POS_CENTER_ON_PARENT);
 
-    g_signal_connect_swapped (w, "response",
-                               G_CALLBACK (gtk_widget_destroy), w);
-
     gtk_widget_show_all (GTK_WIDGET (w));
 }
 

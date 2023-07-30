@@ -1552,7 +1552,7 @@ activate (GApplication *app) {
 int
 main (int argc, char **argv)
 {
-  GtkWidget *status_bar, *ui;
+  GtkWidget *ui;
 
   /* We override the read color functions because we are using a GdkColor 
      structures to store the color. If I put this in lib/config_file.c, then 
@@ -1605,12 +1605,7 @@ main (int argc, char **argv)
   current_wdata = &window2;
 
   ui = CreateFTPWindows (GTK_WIDGET(main_window));
-#if 0
-  /* Give the status bar at the bottom, for reasons... */
-  status_bar = gtk_statusbar_new();
-  gtk_box_pack_start (GTK_BOX (ui), status_bar, TRUE, TRUE, 0);
-  gtk_widget_show (status_bar);
-#endif
+
   gtk_container_add (GTK_CONTAINER (main_window), ui);
   gtk_widget_show (GTK_WIDGET(main_window));
 

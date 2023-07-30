@@ -369,11 +369,18 @@ void about_dialog (gpointer data)
 {
     DEBUG_PRINT_FUNC
     GtkWidget *w;
-    const gchar * authors[] =
-    {
-        "Brian Masney <masneyb@gftp.org>",
-        NULL
-    };
+    const char *authors[2] = { NULL, NULL };
+    const char *license = NULL;
+    char *AUTHORS_FILE = g_build_filename (gftp_get_doc_dir(), "AUTHORS", NULL);
+    char *LICENSE_FILE = g_build_filename (gftp_get_doc_dir(), "LICENSE", NULL);
+    char *AUTHORS_FILE_BUF = NULL;
+    char *LICENSE_FILE_BUF = NULL;
+
+    g_file_get_contents (AUTHORS_FILE, &AUTHORS_FILE_BUF, NULL, NULL);
+    g_file_get_contents (LICENSE_FILE, &LICENSE_FILE_BUF, NULL, NULL);
+    authors[0] = AUTHORS_FILE_BUF ? AUTHORS_FILE_BUF : "AUTHORS file not found";
+    license    = LICENSE_FILE_BUF ? LICENSE_FILE_BUF : "LICENSE file not found";
+
     /* TRANSLATORS: Replace this string with your names, one name per line. */
     gchar * translators = _("Translated by");
 
@@ -388,9 +395,9 @@ void about_dialog (gpointer data)
     w = g_object_new (GTK_TYPE_ABOUT_DIALOG,
                       "version",      VERSION,
                       "program-name", "gFTP",
-                      "copyright",    "Copyright (C) 1998-2020",
+                      "copyright",    "Copyright (C) 1998-2023",
                       "comments",     _("A multithreaded ftp client"),
-                      "license",      "MIT - see LICENSE file.",
+                      "license",      license,
                       "website",      "http://www.gftp.org",
                       "authors",      authors,
                       "translator-credits", translators,
@@ -401,10 +408,10 @@ void about_dialog (gpointer data)
     gtk_window_set_transient_for (GTK_WINDOW (w), main_window);
     gtk_window_set_modal (GTK_WINDOW (w), TRUE);
     gtk_window_set_position (GTK_WINDOW (w), GTK_WIN_POS_CENTER_ON_PARENT);
-#if 0
+
     g_signal_connect_swapped (w, "response",
                                G_CALLBACK (gtk_widget_destroy), w);
-#endif
+
     gtk_widget_show_all (GTK_WIDGET (w));
 }
 

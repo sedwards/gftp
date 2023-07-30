@@ -892,6 +892,7 @@ CreateConnectToolbar (GtkWidget * parent)
 		  , GTK_ICON_SIZE_SMALL_TOOLBAR
 		  #endif
 		  );
+
   stop_btn = gtk_button_new ();
   gtk_container_add (GTK_CONTAINER (stop_btn), tempwid);
   gtk_widget_set_sensitive (stop_btn, 0);
@@ -1186,7 +1187,7 @@ CreateFTPWindows (GtkWidget * ui)
   g_signal_connect_swapped (G_OBJECT (upload_right_arrow), "clicked",
                             G_CALLBACK (put_files), NULL);
 
-  w = gtk_image_new_from_icon_name ("gtk-go-back"
+  w = gtk_image_new_from_icon_name ("gtk-go-forward"
                   #if GTK_MAJOR_VERSION < 4
                   , GTK_ICON_SIZE_SMALL_TOOLBAR
                   #endif

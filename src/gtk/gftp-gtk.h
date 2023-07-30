@@ -79,7 +79,7 @@ typedef struct gftp_window_data_tag
   gftp_request * request;	/* The host that we are connected to */
   GList * files,		/* Files in the listbox */
         ** history;		/* History of the directories */
-  GtkUIManager *ifactory; 	/* This is for the menus that will
+  GtkBuilder *ifactory; 	/* This is for the menus that will
                                    come up when you right click */
   pthread_t tid;		/* Thread for the stop button */
   char *prefix_col_str;
@@ -173,7 +173,7 @@ extern GHashTable * graphic_hash_table;
 extern GHashTable * pixbuf_hash_table;
 
 extern GtkActionGroup * menus;
-extern GtkUIManager * factory;
+extern GtkBuilder * factory;
 
 extern pthread_mutex_t log_mutex;
 extern pthread_t main_thread_id;
@@ -229,6 +229,16 @@ void stop_button				( GtkWidget * widget,
 						  gpointer data );
 
 void gftpui_show_or_hide_command 		( void );
+
+void on_activate_colored_msgs_cb (GtkToggleAction * checkb);
+
+void _gftp_menu_exit (GtkWidget * widget, gpointer data);
+
+void gftp_gtk_refresh (gftp_window_data * wdata);
+
+void navi_up_directory (gftp_window_data * wdata);
+
+void openurl_dialog (gpointer data);
 
 /* listbox.c */
 GtkWidget * create_listbox 			(gftp_window_data *wdata);
@@ -424,6 +434,141 @@ void view_file 					( char *filename,
 						  unsigned int dontupload,
 						  char *remote_filename, 
 						  gftp_window_data * wdata );
+
+//
+//  CreateMenu Rewrite
+//  FIXME: Move to menu_callbacks.h
+extern void on_local_openurl_dialog (void);
+extern void on_remote_openurl_dialog (void);
+extern void on_local_gftpui_disconnect (void);
+extern void on_remote_gftpui_disconnect (void);
+extern void on_local_change_filespec (void);
+extern void on_remote_change_filespec (void);
+extern void on_local_show_selected (void);
+void on_remote_show_selected (void);
+void on_local_navi_up_directory (void);
+void on_remote_navi_up_directory (void);
+void on_local_selectall (void);
+void on_remote_selectall (void);
+void on_local_selectallfiles (void);
+void on_remote_selectallfiles (void);
+void on_local_deselectall (void);
+void on_remote_deselectall (void);
+void on_local_save_directory_listing (void);
+void on_remote_save_directory_listing (void);
+void on_local_gftpui_site_dialog (void);
+void on_remote_gftpui_site_dialog (void);
+void on_local_gftpui_chdir_dialog (void);
+void on_remote_gftpui_chdir_dialog (void);
+void on_local_chmod_dialog (void);
+void on_remote_chmod_dialog (void);
+void on_local_gftpui_mkdir_dialog (void);
+void on_remote_gftpui_mkdir_dialog (void);
+void on_local_gftpui_rename_dialog (void);
+void on_remote_gftpui_rename_dialog (void);
+void on_local_delete_dialog (void);
+void on_remote_delete_dialog (void);
+void on_local_edit_dialog(void);
+void on_remote_edit_dialog(void);
+void on_local_view_dialog (void);
+void on_remote_view_dialog (void);
+void on_local_gftp_gtk_refresh (void);
+void on_remote_gftp_gtk_refresh (void);
+
+// ===
+// FIXME:
+// When all of the legacy menu stuff is moved out of gftp-gtk.c
+// This should be moved to where-ever we stick the legacy 
+// Code until it can be disabled/removed
+
+  static inline GtkActionEntry menu_items[] =
+  {
+    //  name                    stock_id               "label"                  accel             tooltip  callback
+    { "FTPMenu",              NULL,                  N_("g_FTP"),             NULL,                NULL, NULL                   },
+    { "FTPPreferences",       "gtk-preferences",     N_("_Preferences..."),   NULL,                NULL, G_CALLBACK(options_dialog) },
+    { "FTPQuit",              "gtk-quit",            N_("_Quit"),             "<control>Q",        NULL, G_CALLBACK(_gftp_menu_exit)  },
+
+    { "LocalMenu",            NULL,                  N_("_Local"),            NULL,                NULL, NULL },
+    { "LocalOpenLocation",    "gtk-open",            N_("_Open Location..."), "<control><shift>O", NULL, G_CALLBACK(on_local_openurl_dialog) },
+    { "LocalDisconnect",      "gtk-close",           N_("D_isconnect"),       "<control><shift>I", NULL, G_CALLBACK(on_local_gftpui_disconnect) },
+    { "LocalChangeFilespec",  NULL,                  N_("Change _Filespec"),  "<control><shift>F", NULL, G_CALLBACK(on_local_change_filespec) },
+    { "LocalShowSelected",    NULL,                  N_("_Show selected"),    NULL,                NULL, G_CALLBACK(on_local_show_selected) },
+    { "LocalNavigateUp",      NULL,                  N_("Navigate _Up"),      "<ctrl><alt>Up",     NULL, G_CALLBACK(on_local_navi_up_directory) },
+    { "LocalSelectAll",       NULL,                  N_("Select _All"),       "<control><shift>A", NULL, G_CALLBACK(on_local_selectall) },
+    { "LocalSelectAllFiles",  NULL,                  N_("Select All Files"),  NULL,                NULL, G_CALLBACK(on_local_selectallfiles) },
+    { "LocalDeselectAll",     NULL,                  N_("Deselect All"),      NULL,                NULL, G_CALLBACK(on_local_deselectall) },
+    { "LocalSaveDirectoryListing", NULL,             N_("Save Directory Listing..."), NULL,        NULL, G_CALLBACK(on_local_save_directory_listing) },
+    { "LocalSendSITECommand", NULL,                  N_("Send SITE Command.."),NULL,               NULL, G_CALLBACK(on_local_gftpui_site_dialog) },
+    { "LocalChangeDirectory", NULL,                  N_("_Change Directory"), NULL,                NULL, G_CALLBACK(on_local_gftpui_chdir_dialog) },
+    { "LocalPermissions",     NULL,                  N_("_Permissions..."),   "<control><shift>P", NULL, G_CALLBACK(on_local_chmod_dialog) },
+    { "LocalNewFolder",       NULL,                  N_("_New Folder..."),    "<control><shift>N", NULL, G_CALLBACK(on_local_gftpui_mkdir_dialog) },
+    { "LocalRename",          NULL,                  N_("Rena_me..."),        "<control><shift>M", NULL, G_CALLBACK(on_local_gftpui_rename_dialog) },
+    { "LocalDelete",          NULL,                  N_("_Delete..."),        "<control><shift>D", NULL, G_CALLBACK(on_local_delete_dialog) },
+    { "LocalEdit",            NULL,                  N_("_Edit..."),          "<control><shift>E", NULL, G_CALLBACK(on_local_edit_dialog) },
+    { "LocalView",            NULL,                  N_("_View..."),          "<control><shift>L", NULL, G_CALLBACK(on_local_view_dialog) },
+    { "LocalRefresh",         "gtk-refresh",         N_("_Refresh"),          "<control><shift>R", NULL, G_CALLBACK(on_local_gftp_gtk_refresh) },
+
+    { "RemoteMenu",           NULL,                  N_("_Remote"),            NULL,               NULL, NULL },
+    { "RemoteOpenLocation",   "gtk-open",            N_("_Open Location..."), "<control>O",        NULL, G_CALLBACK(on_remote_openurl_dialog) },
+    { "RemoteDisconnect",     "gtk-close",           N_("D_isconnect"),       "<control>I",        NULL, G_CALLBACK(on_remote_gftpui_disconnect) },
+    { "RemoteChangeFilespec", NULL,                  N_("Change _Filespec"),  "<control>F",        NULL, G_CALLBACK(on_remote_change_filespec) },
+    { "RemoteShowSelected",   NULL,                  N_("_Show selected"),    NULL,                NULL, G_CALLBACK(on_remote_show_selected) },
+    { "RemoteNavigateUp",     NULL,                  N_("Navigate _Up"),      "<alt>Up",           NULL, G_CALLBACK(on_remote_navi_up_directory) },
+    { "RemoteSelectAll",      NULL,                  N_("Select _All"),       "<control>A",        NULL, G_CALLBACK(on_remote_selectall) },
+    { "RemoteSelectAllFiles", NULL,                  N_("Select All Files"),  NULL,                NULL, G_CALLBACK(on_remote_selectallfiles) },
+    { "RemoteDeselectAll",    NULL,                  N_("Deselect All"),      NULL,                NULL, G_CALLBACK(on_remote_deselectall) },
+    { "RemoteSaveDirectoryListing", NULL,            N_("Save Directory Listing..."), NULL,        NULL, G_CALLBACK(on_remote_save_directory_listing) },
+    { "RemoteSendSITECommand",NULL,                  N_("Send SITE Command.."),NULL,               NULL, G_CALLBACK(on_remote_gftpui_site_dialog) },
+    { "RemoteChangeDirectory",NULL,                  N_("_Change Directory"), NULL,                NULL, G_CALLBACK(on_remote_gftpui_chdir_dialog) },
+    { "RemotePermissions",    NULL,                  N_("_Permissions..."),   "<control>P",        NULL, G_CALLBACK(on_remote_chmod_dialog) },
+    { "RemoteNewFolder",      NULL,                  N_("_New Folder..."),    "<control>N",        NULL, G_CALLBACK(on_remote_gftpui_mkdir_dialog) },
+    { "RemoteRename",         NULL,                  N_("Rena_me..."),        "<control>M",        NULL, G_CALLBACK(on_remote_gftpui_rename_dialog) },
+    { "RemoteDelete",         NULL,                  N_("_Delete..."),        "<control>D",        NULL, G_CALLBACK(on_remote_delete_dialog) },
+    { "RemoteEdit",           NULL,                  N_("_Edit..."),          "<control>E",        NULL, G_CALLBACK(on_remote_edit_dialog) },
+    { "RemoteView",           NULL,                  N_("_View..."),          "<control>L",        NULL, G_CALLBACK(on_remote_view_dialog) },
+    { "RemoteRefresh",        "gtk-refresh",         N_("_Refresh"),          "<control>R",        NULL, G_CALLBACK(on_remote_gftp_gtk_refresh) },
+
+    { "BookmarksMenu",        NULL,                  N_("_Bookmarks"),        NULL,                NULL, NULL },
+    { "BookmarksAddBookmark", "gtk-add",             N_("Add _Bookmark"),     "<control>B",        NULL, G_CALLBACK(add_bookmark) },
+    { "BookmarksEditBookmarks",NULL,                 N_("Edit Bookmarks"),    NULL,                NULL, G_CALLBACK(edit_bookmarks) },
+
+    { "TransferMenu",         NULL,                  N_("_Transfer"),         NULL,                NULL, NULL },
+    { "TransferStart",        NULL,                  N_("_Start"),            NULL,                NULL, G_CALLBACK(start_transfer) },
+    { "TransferStop",         "gtk-stop",            N_("St_op"),             NULL,                NULL, G_CALLBACK(stop_transfer) },
+    { "TransferSkipCurrentFile",NULL,                N_("Skip _Current File"),NULL,                NULL, G_CALLBACK(skip_transfer) },
+    { "TransferRemoveFile",   "gtk-delete",          N_("_Remove File"),      NULL,                NULL, G_CALLBACK(remove_file_transfer) },
+    { "TransferMoveFileUp",   "gtk-go-up",           N_("Move File _Up"),     NULL,                NULL, G_CALLBACK(move_transfer_up) },
+    { "TransferMoveFileDown", "gtk-go-down",         N_("Move File _Down"),   NULL,                NULL, G_CALLBACK(move_transfer_down) },
+    { "TransferRetrieveFiles",NULL,                  N_("_Retrieve Files"),   "<control>R",        NULL, G_CALLBACK(get_files) },
+    { "TransferPutFiles",    NULL,                   N_("_Put Files"),        "<control>U",        NULL, G_CALLBACK(put_files) },
+
+    { "LogMenu",             NULL,                   N_("L_og"),              NULL,                NULL, NULL },
+    { "LogClear",            "gtk-clear",            N_("_Clear"),            NULL,                NULL, G_CALLBACK(clearlog) },
+    { "LogView",             NULL,                   N_("_View"),             NULL,                NULL, G_CALLBACK(viewlog) },
+    { "LogSave",             "gtk-save",             N_("_Save..."),          NULL,                NULL, G_CALLBACK(savelog) },
+
+    { "ToolsMenu",           NULL,                   N_("Tool_s"),            NULL,                NULL, NULL },
+    { "ToolsCompareWindows", NULL,                   N_("C_ompare Windows"),  NULL,                NULL, G_CALLBACK(compare_windows) },
+    { "ToolsClearCache",     "gtk-clear",            N_("_Clear Cache"),      NULL,                NULL, G_CALLBACK(clear_cache) },
+
+    { "HelpMenu",            NULL,                   N_("_Help"),             NULL,                NULL, NULL },
+    { "HelpAbout",           "gtk-about",            N_("_About"),            NULL,                NULL, G_CALLBACK(about_dialog) },
+  };
+
+  static inline GtkToggleActionEntry menu_check_colormsg[] = {
+    { "FTPColorMsg", NULL, N_("Colored messages"), "<control><alt>C", NULL,
+      G_CALLBACK (on_activate_colored_msgs_cb), FALSE }, //FALSE: need a constant element
+  };
+
+  static inline GtkRadioActionEntry menu_radio_window[] = {
+    { "FTPWindow1", NULL, N_("Window _1"), "<control>1", NULL, GFTP_MENU_ITEM_WIN1 },
+    { "FTPWindow2", NULL, N_("Window _2"), "<control>2", NULL, GFTP_MENU_ITEM_WIN2 },
+  };
+  static inline GtkRadioActionEntry menu_radio_mode[] = {
+    { "FTPAscii",  NULL, N_("_Ascii"),  NULL, NULL, GFTP_MENU_ITEM_ASCII },
+    { "FTPBinary", NULL, N_("_Binary"), NULL, NULL, GFTP_MENU_ITEM_BINARY },
+  };
+
 
 #endif
 

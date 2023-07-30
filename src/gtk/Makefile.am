@@ -11,6 +11,7 @@ gftp_gtk_SOURCES = bookmarks.c \
 	gtkui_transfer.c \
 	listbox.c \
 	menu-items.c \
+	menu_bar.c \
 	misc-gtk.c \
 	options_dialog.c \
 	platform_specific.c \
